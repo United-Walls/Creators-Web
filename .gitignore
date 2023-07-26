@@ -10,6 +10,7 @@
 
 # production
 /build
+/creators
 
 # misc
 .DS_Store

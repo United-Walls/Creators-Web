@@ -1,3 +1,21 @@
+:root {
+  --textColor: #C6D0F5;
+  --bgColor: #232634;
+  --bgColorTr: #23263420;
+  --bgSecondaryColor: #292C3C;
+  --bgTertiaryColor: #303446;
+  --boxColor: #89b4fa;
+  --successColor: #a6e3a1;
+  --dangerColor: #f38ba8;
+  background-color: var(--bgTertiaryColor);
+  color: var(--textColor);
+}
+
+@font-face {
+  font-family: billiondreams;
+  src: url("./assets/fonts/billiondreams.ttf");
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +28,17 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: var(--textColor);
+  opacity: 0.2; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: var(--textColor);
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: var(--textColor);
 }

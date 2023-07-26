@@ -1,0 +1,83 @@
+.logoContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo, .logosub {
+    padding: 0;
+    margin: 0;
+    font-family: billiondreams;
+    font-weight: 100;
+    font-size: 5rem;
+}
+
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--bgSecondaryColor);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+    width: 30%;
+}
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.formContainer input {
+    margin: 0.5rem 0;
+    background-color: var(--bgColor);
+    padding: 1rem;
+    border: none;
+    border-radius: 2rem;
+    color: var(--textColor);
+    outline-color: var(--textColor);
+    width: 100%;
+}
+
+.formContainer button {
+    margin: 1rem 0;
+    background-color: var(--successColor);
+    border: none;
+    width: 150px;
+    padding: 1rem;
+    border-radius: 1rem;
+    color: var(--bgSecondaryColor);
+}
+
+.twoFaFormContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+input.twoFABox {
+    margin: 0.5rem;
+    background-color: var(--bgColor);
+    padding: 1rem;
+    border: none;
+    border-radius: 1rem;
+    color: var(--textColor);
+    outline-color: var(--textColor);
+    width: 20px;
+    height: 20px;
+    text-align: center;
+}
+
+@media screen and (max-width: 80rem) {
+    .container {
+      width: 80%;
+    }
+}
