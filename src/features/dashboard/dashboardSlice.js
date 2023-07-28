@@ -7,7 +7,9 @@ const initialState = {
     avatar_file_url: null,
     walls: [],
     page: 0,
-    totalNumberOfWalls: 0
+    totalNumberOfWalls: 0,
+    sidebarOpened: false,
+    userId: null
 };
 
 export const loadWallsAndUserAsync = createAsyncThunk(
@@ -29,7 +31,11 @@ export const loadWallCount = createAsyncThunk(
 export const dashboardSlice = createSlice({
     name: 'dashboard',
     initialState,
-    reducers: {},
+    reducers: {
+        toggleSidebar: (state) => {
+            state.sidebarOpened = !state.sidebarOpened;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(loadWallsAndUserAsync.pending, (state) => {
@@ -40,8 +46,9 @@ export const dashboardSlice = createSlice({
                 state.status = 'idle';
                 state.username = userData.username;
                 state.page = state.page + 1;
-                state.walls = [state.walls, userData.walls];
+                state.walls = [...state.walls, ...userData.walls];
                 state.avatar_file_url = userData.avatar_file_url;
+                state.userId = userData.userID;
             })
             .addCase(loadWallCount.pending, (state) => {
                 state.status = 'loading';
@@ -54,5 +61,6 @@ export const dashboardSlice = createSlice({
     }
 });
 
-export default dashboardSlice.reducer; 
+export const { toggleSidebar } = dashboardSlice.actions;
 
+export default dashboardSlice.reducer; 

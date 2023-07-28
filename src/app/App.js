@@ -8,6 +8,13 @@ import setAuthToken from '../utils/setAuthToken';
 import './App.css';
 import PrivateRouting from '../components/PrivateRouting/PrivateRouting';
 import Dashboard from '../screens/dashboard/Dashboard';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faHome, faLink, faList, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
+import { fab } from '@fortawesome/free-brands-svg-icons';
+
+library.add(
+  faHome, faList, faUpload, faUser, fab, faLink
+)
 
 const App = () => {
   const userToken = useUserToken();

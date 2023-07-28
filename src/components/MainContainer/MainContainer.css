@@ -1,0 +1,164 @@
+.mainContainer {
+    margin: 0 auto;
+    width: 80vw;
+}
+
+.sidebar {
+    padding-top: 6rem;
+    position: fixed;
+    overflow: hidden;
+    width: 20%;
+    padding-left: 1rem;
+    border-right: 1px solid var(--bgColor);
+    box-shadow: inset -15px 0px 20px -8px var(--bgColorTr);
+    height: 100vh;
+    z-index: 99;
+}
+
+.sidebar .userContainer {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 1rem;
+    transition: all 250ms ease;
+    border: 1px solid transparent;
+}
+
+.sidebar .userContainer:hover {
+    background-color: var(--bgSecondaryColor);
+    border: 1px solid var(--bgColor);
+    cursor: pointer;
+}
+
+.userContainer img {
+    width: 50px;
+    height: 50px;
+    border-radius: 1rem;
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+}
+
+.userContainer .userData span:first-child {
+    font-weight: bolder;
+}
+
+.userContainer .userData span:last-child {
+    font-size: 0.8rem;
+}
+
+.userContainer .userData span {
+    margin-left: 1rem;
+}
+
+.userContainer .userData {
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    position: relative;
+    overflow-y: scroll;
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.content .placeholderContent {
+    width: 26%;
+    padding-left: 1rem;
+}
+
+.content .wrapper {
+    width: 76%;
+}
+
+@media screen and (max-width: 90rem) {
+    .mainContainer {
+        width: 90vw;
+    }
+
+    .sidebar {
+        width: 22.5%;
+    }
+}
+
+@media screen and (max-width: 80rem) {
+    .mainContainer {
+        width: 100vw;
+    }
+
+    .sidebar {
+        width: 25%;
+    }
+}
+
+@media screen and (max-width: 70rem) {
+    .sidebar.opened {
+        transform: unset;
+    }
+    .sidebar {
+        transition: all 250ms ease;
+        transform: translateX(-25rem);
+        width: 30%;
+        border: none;
+        background-color: var(--bgColorTr);
+        box-shadow: 15px 0px 20px -8px var(--bgColorTr);
+    }
+    .sidebar::before {
+        position: absolute;
+        content: "";
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        backdrop-filter: blur(20px);
+        z-index: -1;
+    }
+    .content .placeholderContent {
+        display: none;
+    }
+    .content .wrapper {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 60rem) {
+    .sidebar {
+        width: 40%;
+        border: none;
+        background-color: var(--bgColorTr);
+    }
+}
+
+@media screen and (max-width: 50rem) {
+    .sidebar {
+        width: 50%;
+        border: none;
+        background-color: var(--bgColorTr);
+    }
+}
+
+@media screen and (max-width: 40rem) {
+    .sidebar {
+        width: 60%;
+        border: none;
+        background-color: var(--bgColorTr);
+    }
+}
+
+@media screen and (max-width: 30rem) {
+    .sidebar {
+        width: 70%;
+        border: none;
+        background-color: var(--bgColorTr);
+    }
+}
+
+@media screen and (max-width: 20rem) {
+    .sidebar {
+        width: 100%;
+        border: none;
+        background-color: var(--bgColorTr);
+    }
+}
