@@ -39,7 +39,7 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
   }, [uploadProfilePic]);
 
   useEffect(() => {
-    if(textInputs.username == "") {
+    if(textInputs.username === "") {
       setErrors((state) => {
         let newState = state;
         if (newState && newState.length > 0) {

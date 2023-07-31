@@ -79,7 +79,7 @@ export const authSlice = createSlice({
             })
             .addCase(twoFAAsync.rejected, (state, action) => {
                 state.status = 'idle';
-                if (action.payload == "Server Error") {
+                if (action.payload === "Server Error") {
                     state.is2FA = false;
                     state.isAuthenticated = false;
                 } else {
