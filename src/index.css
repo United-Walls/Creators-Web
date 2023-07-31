@@ -7,6 +7,7 @@
   --boxColor: #89b4fa;
   --successColor: #a6e3a1;
   --dangerColor: #f38ba8;
+  --accentColor: #74c7ec;
   background-color: var(--bgTertiaryColor);
   color: var(--textColor);
 }
@@ -16,9 +17,14 @@
   src: url("./assets/fonts/billiondreams.ttf");
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Varela Round', 'Dosis', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -41,4 +47,10 @@ code {
 
 ::-ms-input-placeholder { /* Microsoft Edge */
   color: var(--textColor);
+}
+
+input, textarea {
+  font-family: 'Dosis', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
 }

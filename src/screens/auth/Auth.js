@@ -62,7 +62,8 @@ const TwoFAView = () => {
                   <input
                     key={index}
                     ref={ref}
-                    type="text"
+                    type="number" 
+                    pattern="[0-9]*"
                     id={`box${index}-1`}
                     onChange={(e) => {
                       e.target.value = e.target.value.replace(/[^\d]/,'-');

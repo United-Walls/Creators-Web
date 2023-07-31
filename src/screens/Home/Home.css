@@ -65,6 +65,15 @@
 .home .userSettings {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home .userSettings form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     width: 100%;
 }
 
@@ -74,6 +83,15 @@
     margin-left: 2rem;
     margin-right: 2rem;
     padding-bottom: 2rem;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 1;
+}
+
+.home .userSettings .setting .settingTitle, .home .userSettings .setting .settingInfo, .home .userSettings .setting .inputContainer {
+    width: 80%;
 }
 
 .home .userSettings .setting .settingTitle, .home .settingButton {
@@ -88,11 +106,16 @@
     box-shadow: 0px 15px 20px -8px var(--bgColorTr);
 }
 
+.home .settingButton.success {
+    background-color: var(--successColor);
+}
+
 .home .settingButton {
     margin: 0 2rem;
     margin-bottom: 2rem;
-    background-color: var(--successColor);
     color: var(--bgColor);
+    background-color: var(--accentColor);
+    width: 50%;
 }
 
 .home .settingButton:hover {
@@ -104,9 +127,16 @@
 }
 
 .home .userSettings .setting .inputContainer {
-    margin: 0.5rem 1rem;
     display: flex;
     align-items: center;
+    flex-direction: center;
+}
+
+.home .userSettings .setting .inputContainer .error {
+    color: var(--dangerColor);
+    font-size: 0.8rem;
+    padding-left: 3rem;
+    padding-bottom: 1rem;
 }
 
 .home .userSettings .setting .inputContainer .settingInput {
@@ -125,7 +155,59 @@
     width: 25px;
 }
 
+.home .userSettings .setting .dropZone {
+    background-color: var(--bgColor);
+    padding: 1rem;
+    width: 75%;
+    border-radius: 2rem;
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home .userSettings .setting .dropZone.big {
+    height: 100px;
+}
+
+.home .userSettings .setting .dropZone .imageContainer {
+    margin-top: 1rem;
+}
+
+.home .userSettings .setting .dropZone .imageContainer img {
+    width: 200px;
+    height: 200px;
+    border-radius: 2rem;
+    border: 10px solid var(--bgColor);
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+}
+
+.home .userSettings .setting .dropZone .row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home .userSettings .setting .dropZone:hover {
+    cursor: pointer;
+}
+
+.home .userSettings .setting .dropZone svg {
+    font-size: 3rem;
+    margin-right: 1rem;
+}
+
+.home .userSettings .setting .file {
+    padding: 1rem 0;
+}
+
 @media screen and (max-width: 45rem) {
+    .home .userHeader .userInfo {
+        margin-left: 0;
+        text-align: center;
+    }
+
     .home .userHeader {
         flex-direction: column;
         align-items: center;
@@ -140,11 +222,10 @@
     .home .userHeader .userInfo .userDetails {
         width: 100%;
     }
-}
 
-@media screen and (max-width: 30rem){
     .home .userHeader .userInfo .userDetails .userDetail {
         padding: 0.5rem;
+        width: 120px;
     }
 }
 

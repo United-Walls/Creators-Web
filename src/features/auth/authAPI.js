@@ -7,9 +7,10 @@ export const fetchToken = async ({ username, password }) => {
         const response = await api.post('creators/auth', body);
         localStorage.setItem('token', response.data.token);
         setAuthToken(response.data.token)
-        return;
+        return { error: false };
     } catch(err) {
         console.error('DEBUG - ', err);
+        return { error: true, msg: err.response.data };
     }
 }
 
@@ -19,7 +20,8 @@ export const send2FA = async ({twoFA}) => {
         const response = await api.post('/creators/auth/2fa', body);
         return response.data;
     } catch(err) {
-        console.error('DEBUG - ', err)
+        console.error('DEBUG - ', err);
+        return { error: true };
     }
 }
 
@@ -29,5 +31,6 @@ export const fetchUser = async () => {
         return response.data;
     } catch(err) {
         console.error('DEBUG - ', err);
+        return { error: true, msg: err.response.data };
     }
 }

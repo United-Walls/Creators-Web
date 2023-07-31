@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import Auth from '../screens/auth/Auth'
 import useUserToken  from '../hooks/useUserToken'
 import { useDispatch } from 'react-redux';
@@ -9,11 +9,12 @@ import './App.css';
 import PrivateRouting from '../components/PrivateRouting/PrivateRouting';
 import Dashboard from '../screens/dashboard/Dashboard';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faHome, faLink, faList, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faImage, faLink, faList, faQuoteLeft, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
+import Toast from '../components/Toast/Toast';
 
 library.add(
-  faHome, faList, faUpload, faUser, fab, faLink
+  faHome, faList, faUpload, faUser, fab, faLink, faQuoteLeft, faImage
 )
 
 const App = () => {
@@ -30,12 +31,15 @@ const App = () => {
   }, [userToken, dispatch]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Auth />} />
-        <Route path='dashboard/*' element={<PrivateRouting component={ Dashboard } />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      <HashRouter basename={process.env.PUBLIC_URL}>
+        <Routes>
+          <Route path='/' element={<Auth />} />
+          <Route path='dashboard/*' element={<PrivateRouting component={ Dashboard } />} />
+        </Routes>
+      </HashRouter>
+      <Toast />
+    </>
   )
 }
 

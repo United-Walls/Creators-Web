@@ -56,6 +56,8 @@
 }
 
 .content {
+    max-width: 100%;
+    overflow-x: hidden;
     position: relative;
     overflow-y: scroll;
     display: flex;
@@ -96,10 +98,16 @@
 @media screen and (max-width: 70rem) {
     .sidebar.opened {
         transform: unset;
+        opacity: unset;
+    }
+    .sidebar.opened::before {
+        transform: unset;
+        opacity: unset;
     }
     .sidebar {
         transition: all 250ms ease;
         transform: translateX(-25rem);
+        opacity: 0;
         width: 30%;
         border: none;
         background-color: var(--bgColorTr);
@@ -114,6 +122,8 @@
         bottom: 0;
         backdrop-filter: blur(20px);
         z-index: -1;
+        opacity: 0;
+        transition: all 250ms ease;
     }
     .content .placeholderContent {
         display: none;

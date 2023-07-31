@@ -17,9 +17,12 @@
     ;
     transition: all 0.25s ease;
     z-index: 99;
+    flex-wrap: nowrap;
 }
 
 .sidebarButton {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
     cursor: pointer;
     border: none;
     background-color: transparent;
@@ -40,6 +43,7 @@
 }
 
 .sidebarButton .line {
+    flex-shrink: 0;
     display: block;
     height: 4px;
     width: 100%;
@@ -77,5 +81,9 @@
     .sidebarButton, .placeholder {
       visibility: visible;
       pointer-events: all;
+    }
+
+    .logo {
+        font-size: 4rem;
     }
 }
