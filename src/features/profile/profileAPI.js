@@ -20,6 +20,6 @@ export const updateProfilePic = async (formData) => {
         return response.data;
     } catch(err) {
         console.error('DEBUG - ', err);
-        return { error: true };
+        return { error: true, code: err.response.status };
     }
 }

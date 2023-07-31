@@ -23,11 +23,17 @@ export const loginAsync = createAsyncThunk(
 
 export const twoFAAsync = createAsyncThunk(
     'auth/2fa',
-    async (twoFA, { dispatch }) => {
+    async (twoFA, { dispatch, rejectWithValue }) => {
         const userData = await send2FA({twoFA});
         if (userData && userData.error) {
+            if (userData.code === 400) {
+                dispatch(showToast({ status: "error", message: userData.msg }));
+                setTimeout(() => dispatch(hideToast()), 3000);
+                return rejectWithValue("Sent another code");
+            }
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
+            return rejectWithValue("Server Error");
         }
         return { user: userData }
     }
@@ -70,6 +76,15 @@ export const authSlice = createSlice({
             })
             .addCase(twoFAAsync.pending, (state) => {
                 state.status = 'loading'
+            })
+            .addCase(twoFAAsync.rejected, (state, action) => {
+                state.status = 'idle';
+                if (action.payload == "Server Error") {
+                    state.is2FA = false;
+                    state.isAuthenticated = false;
+                } else {
+                    state.is2FA = true;
+                }
             })
             .addCase(twoFAAsync.fulfilled, (state, action) => {
                 state.status = 'idle'

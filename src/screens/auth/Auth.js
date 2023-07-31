@@ -78,7 +78,7 @@ const TwoFAView = () => {
                       e.target.select();
                     }}
                     value={twoFAForm[index] === '-' ? "" : twoFAForm[index]}
-                    max={"1"}
+                    max={"9"}
                     className='twoFABox'
                   />
                 );

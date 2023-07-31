@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {ReactComponent as ThreadsIcon} from '../../assets/icons/threads.svg';
 import { useDispatch } from 'react-redux';
 import { updateProfileAsync, updateProfilePicAsync } from '../../features/dashboard/dashboardSlice';
-import { isValidUrl } from '../..';
+import { hasWhiteSpace, isValidUrl } from '../..';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
 
 const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, totalNoOfDownloadedWalls, donationLinks, socialMediaLinks, description }) => {
@@ -39,11 +39,43 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
   }, [uploadProfilePic]);
 
   useEffect(() => {
+    if(textInputs.username == "") {
+      setErrors((state) => {
+        let newState = state;
+        if (newState && newState.length > 0) {
+          if (newState.filter(val => val.inputName === "username").length <= 0) {
+            newState.push({inputName: "username", error: `username can't be blank or have spaces`});
+          }
+        } else {
+          newState = [{inputName: "username", error: "username can't be blank or have spaces"}];
+        }
+
+        return newState;
+      });
+    } else {
+      if (hasWhiteSpace(textInputs.username)) {
+        setErrors((state) => {
+          let newState = state;
+          if (newState && newState.length > 0) {
+            if (newState.filter(val => val.inputName === "username").length <= 0) {
+              newState.push({inputName: "username", error: `username can't be blank or have spaces`});
+            } 
+          } else {
+            newState = [{inputName: "username", error: "username can't be blank or have spaces"}];
+          }
+
+          return newState;
+        });
+      } else {
+        setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "username"));
+      }
+    }
+
     if(textInputs.twitter !== "" && !isValidUrl(textInputs.twitter)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "twitter").length <= 0) {
             newState.push({inputName: "twitter", error: `Not a valid link for twitter`})
           }
@@ -54,14 +86,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "twitter"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "twitter"));
     }
 
     if(textInputs.instagram !== "" && !isValidUrl(textInputs.instagram)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "instagram").length <= 0) {
             newState.push({inputName: "instagram", error: `Not a valid link for instagram`})
           }
@@ -72,14 +104,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "instagram"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "instagram"));
     }
 
     if(textInputs.facebook !== "" && !isValidUrl(textInputs.facebook)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "facebook").length <= 0) {
             newState.push({inputName: "facebook", error: `Not a valid link for facebook`})
           }
@@ -90,14 +122,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "facebook"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "facebook"));
     }
 
     if(textInputs.mastodon !== "" && !isValidUrl(textInputs.mastodon)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "mastodon").length <= 0) {
             newState.push({inputName: "mastodon", error: `Not a valid link for mastodon`})
           }
@@ -108,14 +140,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "mastodon"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "mastodon"));
     }
 
     if(textInputs.threads !== "" && !isValidUrl(textInputs.threads)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "threads").length <= 0) {
             newState.push({inputName: "threads", error: `Not a valid link for threads`})
           }
@@ -126,14 +158,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "threads"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "threads"));
     }
 
     if(textInputs.steam !== "" && !isValidUrl(textInputs.steam)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "steam").length <= 0) {
             newState.push({inputName: "steam", error: `Not a valid link for steam`})
           }
@@ -144,14 +176,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "steam"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "steam"));
     }
 
     if(textInputs.linkedIn !== "" && !isValidUrl(textInputs.linkedIn)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "linkedIn").length <= 0) {
             newState.push({inputName: "linkedIn", error: `Not a valid link for linkedin`})
           }
@@ -162,14 +194,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "linkedIn"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "linkedIn"));
     }
 
     if(textInputs.link !== "" && !isValidUrl(textInputs.link)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "link").length <= 0) {
             newState.push({inputName: "link", error: `Not a valid link for link`})
           }
@@ -180,14 +212,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "link"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "link"));
     }
 
     if(textInputs.paypal !== "" && !isValidUrl(textInputs.paypal)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "paypal").length <= 0) {
             newState.push({inputName: "paypal", error: `Not a valid link for paypal`})
           }
@@ -198,14 +230,14 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "paypal"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "paypal"));
     }
 
     if(textInputs.patreon !== "" && !isValidUrl(textInputs.patreon)) {
       setErrors((state) => {
         let newState = state;
         
-        if (newState.length > 0) {
+        if (newState && newState.length > 0) {
           if (newState.filter(val => val.inputName === "patreon").length <= 0) {
             newState.push({inputName: "patreon", error: `Not a valid link for patreon`})
           }
@@ -216,7 +248,7 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
         return newState;
       });
     } else {
-      setErrors(state => state.filter(val => val.inputName !== "patreon"));
+      setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== "patreon"));
     }
 
     if(textInputs.other.length > 0) {
@@ -226,7 +258,7 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
           setErrors(state => {
             let newState = state;
 
-            if (newState.length > 0) {
+            if (newState && newState.length > 0) {
               if (newState.filter(val => val.inputName === other.title).length <= 0) {
                 newState.push({inputName: other.title, error: `Not a valid link for ${other.title}`});
               }
@@ -235,7 +267,7 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
             }
           });
         } else {
-          setErrors(state => state.filter(val => val.inputName !== other.title));
+          setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== other.title));
         }
       }
     }
@@ -247,7 +279,7 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
           setErrors(state => {
             let newState = state;
 
-            if (newState.length > 0) {
+            if (newState && newState.length > 0) {
               if (newState.filter(val => val.inputName === other.title).length <= 0) {
                 newState.push({inputName: other.title, error: `Not a valid link for ${other.title}`});
               }
@@ -256,7 +288,7 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
             }
           });
         } else {
-          setErrors(state => state.filter(val => val.inputName !== other.title));
+          setErrors(state => (state && state.length > 0) && state.filter(val => val.inputName !== other.title));
         }
       }
     }
@@ -358,6 +390,17 @@ const Home = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, t
                 <div className="icon"><FontAwesomeIcon icon="user" /></div>
                 <input placeholder='Username' type="text" name='username' className="settingInput" value={textInputs.username} onChange={handleInputChange} />
               </div>
+              {
+                errors && errors.length > 0 && errors.map(error => {
+                  if (error.inputName === "username") {
+                    return (
+                      <div key={error.inputName} className="inputContainer">
+                        <span className='error'>Error - {error.error}</span>
+                      </div>
+                    )
+                  } else return ""
+                })
+              }
             </div>
             <div className="setting">
               <div className="settingTitle">Add/Edit Description</div>

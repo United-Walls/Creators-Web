@@ -21,7 +21,7 @@ export const send2FA = async ({twoFA}) => {
         return response.data;
     } catch(err) {
         console.error('DEBUG - ', err);
-        return { error: true };
+        return { error: true, msg: err.response.data, code: err.response.status };
     }
 }
 

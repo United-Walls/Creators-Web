@@ -97,8 +97,12 @@ export const updateProfilePicAsync = createAsyncThunk(
     async (formData, { dispatch, rejectWithValue }) => {
         const updatedData = await updateProfilePic(formData);
         if (updatedData && updatedData.error) {
-            dispatch(showToast({ status: "error", message: "Oops, could not upload!"}));
-            setTimeout(() => dispatch(hideToast()), 3000);
+            if (updatedData.code === 413) {
+                dispatch(showToast({ status: "error", message: "Bro, Image size is too much, should be less than 10 MB!"}));
+            } else {
+                dispatch(showToast({ status: "error", message: "Oops, could not upload!"}));
+            }
+            setTimeout(() => dispatch(hideToast()), 5000);
             return rejectWithValue('Could not upload');
         } else {
             dispatch(showToast({ status: "success", message: "Uploaded Successfully"}));
