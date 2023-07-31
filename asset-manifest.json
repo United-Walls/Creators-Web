@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Creators-Web/static/css/main.50d37725.css",
+    "main.js": "/Creators-Web/static/js/main.2ae6be98.js",
+    "static/media/billiondreams.ttf": "/Creators-Web/static/media/billiondreams.c3670514876327a19952.ttf",
+    "static/media/threads.svg": "/Creators-Web/static/media/threads.30f9ccf61b355c3da51d236ead48b2ee.svg",
+    "index.html": "/Creators-Web/index.html",
+    "main.50d37725.css.map": "/Creators-Web/static/css/main.50d37725.css.map",
+    "main.2ae6be98.js.map": "/Creators-Web/static/js/main.2ae6be98.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.50d37725.css",
+    "static/js/main.2ae6be98.js"
+  ]
+}
