@@ -29,12 +29,12 @@ const Sidebar = ({ username, userPfp, userId }) => {
   )
 }
 
-const Content = ({ walls, username, userPfp, totalNoOfWalls, totalNoOfLikedWalls, totalNoOfDownloadedWalls, donationLinks, socialMediaLinks, description }) => {
+const Content = () => {
   return (
     <div className="content">
       <div className="placeholderContent"></div>
       <div className="wrapper">
-        <Home walls={walls} username={username} userPfp={userPfp} totalNoOfWalls={totalNoOfWalls} totalNoOfLikedWalls={totalNoOfLikedWalls} totalNoOfDownloadedWalls={totalNoOfDownloadedWalls} donationLinks={donationLinks} socialMediaLinks={socialMediaLinks} description={description} />
+        <Home />
       </div>
     </div>
   )
@@ -44,18 +44,18 @@ const MainContainer = () => {
   const dashboardData = useSelector(state => state.dashboard);
 
   return (
-    <div className='mainContainer'>
+    <div className='mainContainer'> 
+      <Sidebar username={dashboardData.username} userPfp={dashboardData.avatar_file_url} userId={dashboardData.userId} />
+      {
+        dashboardData && dashboardData.walls.length > 0 ?
+        <Content />
+        :
+        ""
+      }
       {
         dashboardData.status === "loading" 
         ?
         <Loading />
-        :
-        ""
-      }
-      <Sidebar username={dashboardData.username} userPfp={dashboardData.avatar_file_url} userId={dashboardData.userId} />
-      {
-        dashboardData && dashboardData.walls.length > 0 ?
-        <Content walls={dashboardData.walls} username={dashboardData.username} userPfp={dashboardData.avatar_file_url} totalNoOfWalls={dashboardData.totalNumberOfWalls} totalNoOfLikedWalls={dashboardData.totalNumberOfLikedWalls} totalNoOfDownloadedWalls={dashboardData.totalNumberOfDownloadedWalls} donationLinks={dashboardData.donationLinks} socialMediaLinks={dashboardData.socialMediaLinks} description={dashboardData.description} />
         :
         ""
       }

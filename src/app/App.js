@@ -9,17 +9,17 @@ import './App.css';
 import PrivateRouting from '../components/PrivateRouting/PrivateRouting';
 import Dashboard from '../screens/dashboard/Dashboard';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faHome, faImage, faLink, faList, faQuoteLeft, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faHeart, faHome, faImage, faLink, faList, faQuoteLeft, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import Toast from '../components/Toast/Toast';
 
 library.add(
-  faHome, faList, faUpload, faUser, fab, faLink, faQuoteLeft, faImage
+  faHome, faList, faUpload, faUser, fab, faLink, faQuoteLeft, faImage, faDownload, faHeart
 )
 
 const App = () => {
   const userToken = useUserToken();
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if(userToken) {
@@ -31,7 +31,7 @@ const App = () => {
   }, [userToken, dispatch]);
 
   return (
-    <>
+    <div className='App' >
       <HashRouter basename={process.env.PUBLIC_URL}>
         <Routes>
           <Route path='/' element={<Auth />} />
@@ -39,7 +39,7 @@ const App = () => {
         </Routes>
       </HashRouter>
       <Toast />
-    </>
+    </div>
   )
 }
 

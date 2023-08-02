@@ -1,4 +1,4 @@
-.home .headerImage img {
+.page .headerImage img {
     width: 100%;
     height: 350px;
     object-fit: cover;
@@ -8,12 +8,12 @@
     border-bottom: 10px solid var(--bgColor);
 }
 
-.home .userHeader {
+.page .userHeader {
     display: flex;
     padding: 2rem;
 }
 
-.home .userHeader .userPfp img {
+.page .userHeader .userPfp img {
     width: 200px;
     height: 200px;
     border-radius: 2rem;
@@ -21,29 +21,29 @@
     box-shadow: 0px 15px 20px -8px var(--bgColorTr);
 }
 
-.home .userHeader .userPfp {
+.page .userHeader .userPfp {
     margin-top: -7rem;
 }
 
-.home .userHeader .userInfo {
+.page .userHeader .userInfo {
     margin-left: 1rem;
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
-.home .userHeader .userInfo .username {
+.page .userHeader .userInfo .username {
     font-size: 2rem;
     font-weight: bolder;
 }
 
-.home .userHeader .userInfo .userDetails {
+.page .userHeader .userInfo .userDetails {
     display: flex;
     justify-content: space-between;
     padding: 1rem 0;
 }
 
-.home .userHeader .userInfo .userDetails .userDetail {
+.page .userHeader .userInfo .userDetails .userDetail {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -58,7 +58,7 @@
     border: 1px solid var(--bgColor);
 }
 
-.home .userHeader .userInfo .userDetails .userDetail .title {
+.page .userHeader .userInfo .userDetails .userDetail .title {
     font-weight: bolder;
 }
 
@@ -67,6 +67,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    transform-origin: top;
+    animation: 500ms ease 0s 1 slideFromTop;
 }
 
 .home .userSettings form {
@@ -202,35 +204,117 @@
     padding: 1rem 0;
 }
 
+.wallpapers .wallpaperGrid {
+    display: grid;
+    padding: 2rem;
+    grid-template-columns: auto auto auto auto;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+    transform-origin: top;
+    animation: 500ms ease 0s 1 slideFromTop;
+}
+
+.wallpapers .wallpaperGrid .wallpaper {
+    position: relative;
+}
+
+.wallpapers .wallpaperGrid .wallpaper .dataInfo {
+    position: absolute;
+    top: 0rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background: linear-gradient(to left top, transparent, var(--bgColor));
+    border-radius: 1rem;
+}
+
+.wallpapers .wallpaperGrid .wallpaper .dataInfo .data {
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+}
+
+.wallpapers .wallpaperGrid .wallpaper .dataInfo .data .info {
+    margin-left: 0.5rem;
+}
+
+.wallpapers .wallpaperGrid .wallpaper span {
+    opacity: 0;
+    position: absolute;
+    bottom: 0.2rem;
+    left: 0;
+    padding: 1rem;
+    background: linear-gradient(transparent, var(--bgColor));
+    width: 150px;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    transition: 250ms opacity ease;
+}
+
+.wallpapers .wallpaperGrid .wallpaper:hover {
+    cursor: pointer;
+}
+
+.wallpapers .wallpaperGrid .wallpaper:hover span {
+    opacity: 1;
+}
+
+.wallpapers .wallpaperGrid .wallpaper img {
+    object-fit: cover;
+    width: 180px;
+    height: 330px;
+    border-radius: 1rem;
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+    text-shadow: 0px 15px 20px -8px var(--bgColor);
+}
+
+@media screen and (max-width: 50rem) {
+    .wallpapers .wallpaperGrid {
+        grid-template-columns: auto auto auto;
+    }
+}
+
 @media screen and (max-width: 45rem) {
-    .home .userHeader .userInfo {
+    .page .userHeader .userInfo {
         margin-left: 0;
         text-align: center;
     }
 
-    .home .userHeader {
+    .page .userHeader {
         flex-direction: column;
         align-items: center;
         padding: 1rem;
     }
 
-    .home .userHeader .userInfo {
+    .page .userHeader .userInfo {
         align-items: center;
         margin-top: 1rem;
     }
 
-    .home .userHeader .userInfo .userDetails {
+    .page .userHeader .userInfo .userDetails {
         width: 100%;
     }
 
-    .home .userHeader .userInfo .userDetails .userDetail {
+    .page .userHeader .userInfo .userDetails .userDetail {
         padding: 0.5rem;
         width: 120px;
     }
 }
 
-@media screen and (max-width: 20rem){
-    .home .userHeader .userInfo .userDetails .userDetail {
+@media screen and (max-width: 40rem) {
+    .wallpapers .wallpaperGrid {
+        grid-template-columns: auto auto;
+    }
+}
+
+@media screen and (max-width: 25rem){
+    .page .userHeader .userInfo .userDetails .userDetail {
         padding: 0.25rem;
+    }
+
+    .wallpapers .wallpaperGrid .wallpaper img {
+        width: 150px;
+        height: 300px;
     }
 }

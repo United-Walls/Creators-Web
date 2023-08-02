@@ -41,6 +41,7 @@ export const loadWallsAndUserAsync = createAsyncThunk(
     'dashboard/loadWallsAndUser',
     async ({userId, page}, { dispatch }) => {
         const userData = await fetchUserData({ userId, page });
+        console.log(userData);
         const count = await fetchUserWallCount({ userId });
         if (userData && userData.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
@@ -124,6 +125,9 @@ export const dashboardSlice = createSlice({
         builder
             .addCase(loadWallsAndUserAsync.pending, (state) => {
                 state.status = 'loading';
+            })
+            .addCase(loadWallsAndUserAsync.rejected, (state, action) => {
+                console.log(action);
             })
             .addCase(loadWallsAndUserAsync.fulfilled, (state, action) => {
                 const { userData, count } = action.payload;
