@@ -49,7 +49,7 @@ code {
   color: var(--textColor);
 }
 
-input, textarea {
+input, textarea, select {
   font-family: 'Dosis', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
   'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
   sans-serif;
@@ -94,4 +94,13 @@ input[type=number] {
     opacity: 0;
     transform: scale(0.9) translateY(-50px);
   }
+}
+
+div, img {
+  opacity: 1;
+  transition: opacity 250ms ease;
+}
+
+div.loadingImage, img.loading {
+  opacity: 0;
 }

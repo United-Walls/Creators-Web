@@ -96,67 +96,6 @@
     width: 80%;
 }
 
-.home .userSettings .setting .settingTitle, .home .settingButton {
-    text-align: center;
-    border: 1px solid var(--bgColor);
-    background-color: var(--bgSecondaryColor);
-    color: var(--textColor);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 1rem;
-    font-size: 1rem;
-    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
-}
-
-.home .settingButton.success {
-    background-color: var(--successColor);
-}
-
-.home .settingButton {
-    margin: 0 2rem;
-    margin-bottom: 2rem;
-    color: var(--bgColor);
-    background-color: var(--accentColor);
-    width: 50%;
-}
-
-.home .settingButton:hover {
-    cursor: pointer;
-}
-
-.home .userSettings .setting .settingInfo {
-    margin: 1rem;
-}
-
-.home .userSettings .setting .inputContainer {
-    display: flex;
-    align-items: center;
-    flex-direction: center;
-}
-
-.home .userSettings .setting .inputContainer .error {
-    color: var(--dangerColor);
-    font-size: 0.8rem;
-    padding-left: 3rem;
-    padding-bottom: 1rem;
-}
-
-.home .userSettings .setting .inputContainer .settingInput {
-    margin: 0.5rem;
-    background-color: var(--bgColor);
-    padding: 1rem;
-    border: none;
-    border-radius: 2rem;
-    color: var(--textColor);
-    outline-color: var(--textColor);
-    width: 80%;
-}
-
-.home .userSettings .setting .inputContainer .icon svg {
-    height: 25px;
-    width: 25px;
-}
-
 .home .userSettings .setting .dropZone {
     background-color: var(--bgColor);
     padding: 1rem;

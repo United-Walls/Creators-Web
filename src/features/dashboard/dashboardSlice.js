@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchUserData, fetchUserDownloadedWallsCount, fetchUserDownloadedWallsData, fetchUserLikedWallsCount, fetchUserLikedWallsData, fetchUserWallCount } from "../user/userApi";
 import { updateProfile, updateProfilePic } from "../profile/profileAPI";
 import { hideToast, showToast } from "../toast/toastSlice";
+import { deleteWallById, fetchWallByID, updateWallById } from "../wall/wallAPI";
+import { fetchCategories } from "../categories/categoriesAPI";
 
 const initialState = {
     status: 'idle',
@@ -19,6 +21,8 @@ const initialState = {
     totalNumberOfDownloadedWalls: 0,
     sidebarOpened: false,
     userId: "",
+    selectedWall: null,
+    categories: [],
     socialMediaLinks: {
         twitter: "", 
         instagram: "", 
@@ -37,17 +41,62 @@ const initialState = {
     }
 };
 
+export const deleteWallByIdAsync = createAsyncThunk(
+    'dashboard/deleteWall',
+    async ({ wallId }, { dispatch, rejectWithValue }) => {
+        const wall = await deleteWallById({ wallId });
+        if (wall && wall.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong! Could not delete!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        dispatch(showToast({ status: "success", message: wall.file_name + " Deleted Successfully" }));
+        setTimeout(() => dispatch(hideToast()), 3000);
+        return wall;
+    }
+)
+
+export const updateWallByIdAsync = createAsyncThunk(
+    'dashboard/updateWall',
+    async ({ wallId, file_name, category }, { dispatch, rejectWithValue }) => {
+        const wall = await updateWallById({ wallId, file_name, category });
+        if (wall && wall.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong! Could not delete!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        dispatch(showToast({ status: "success", message: wall.file_name + " Updated Successfully" }));
+        setTimeout(() => dispatch(hideToast()), 3000);
+        return wall;
+    }
+)
+
+export const loadSelectedWallAsync = createAsyncThunk(
+    'dashboard/loadSelectedWall',
+    async ({ wallId }, { dispatch, rejectWithValue }) => {
+        const wall = await fetchWallByID({ wallId });
+        if (wall && wall.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        return wall;
+    }
+)
+
 export const loadWallsAndUserAsync = createAsyncThunk(
     'dashboard/loadWallsAndUser',
-    async ({userId, page}, { dispatch }) => {
+    async ({userId, page}, { dispatch, rejectWithValue }) => {
         const userData = await fetchUserData({ userId, page });
+        const categories = await fetchCategories();
         console.log(userData);
         const count = await fetchUserWallCount({ userId });
         if (userData && userData.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
         }
-        return { userData, count };
+        return { userData, categories, count };
     }
 );
 
@@ -119,6 +168,9 @@ export const dashboardSlice = createSlice({
     reducers: {
         toggleSidebar: (state) => {
             state.sidebarOpened = !state.sidebarOpened;
+        },
+        unselectWall: (state) => {
+            state.selectedWall = null;
         }
     },
     extraReducers: (builder) => {
@@ -127,10 +179,10 @@ export const dashboardSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(loadWallsAndUserAsync.rejected, (state, action) => {
-                console.log(action);
+                state.status = 'idle';
             })
             .addCase(loadWallsAndUserAsync.fulfilled, (state, action) => {
-                const { userData, count } = action.payload;
+                const { userData, categories, count } = action.payload;
                 state.status = 'idle';
                 state.username = userData.username ? userData.username : state.username;
                 state.page = state.page + 1;
@@ -141,6 +193,7 @@ export const dashboardSlice = createSlice({
                 state.description = userData.description ? userData.description : state.description;
                 state.donationLinks = userData.donationLinks ? userData.donationLinks : state.donationLinks;
                 state.socialMediaLinks = userData.socialMediaLinks ? userData.socialMediaLinks : state.socialMediaLinks;
+                state.categories = categories;
             })
             .addCase(loadLikedWallsAsync.pending, (state) => {
                 state.status = 'loading';
@@ -187,9 +240,48 @@ export const dashboardSlice = createSlice({
                 state.status = 'idle';
                 state.avatar_file_url = avatar_file_url;
             })
+            .addCase(loadSelectedWallAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(loadSelectedWallAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(loadSelectedWallAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.selectedWall = action.payload;
+            })
+            .addCase(deleteWallByIdAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(deleteWallByIdAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(deleteWallByIdAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.walls = state.walls.filter(wall => wall._id !== action.payload._id);
+            })
+            .addCase(updateWallByIdAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(updateWallByIdAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(updateWallByIdAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.walls = state.walls.map(wall => {
+                    if(wall._id === action.payload._id) {
+                        return action.payload
+                    } else {
+                        return wall
+                    }
+                });
+                if (state.selectedWall) {
+                    state.selectedWall = action.payload;
+                }
+            });
     }
 });
 
-export const { toggleSidebar } = dashboardSlice.actions;
+export const { toggleSidebar, unselectWall } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer; 

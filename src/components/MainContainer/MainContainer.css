@@ -75,6 +75,148 @@
     width: 76%;
 }
 
+.wallmodal {
+    position: fixed;
+    background-color: var(--bgColorTr);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.wallmodal .content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem;
+}
+
+.wallmodal .content img {
+    width: 512px;
+    object-fit: contain;
+    border-radius: 1rem;
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+    margin-right: 1rem;
+}
+
+.wallmodal .content .dialog {
+    background-color: var(--bgSecondaryColor);
+    border-radius: 1rem;
+    width: 512px;
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+    margin: 1rem;
+}
+
+.wallmodal .content .dialog .topBar {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wallmodal .content .dialog .topBar svg {
+    background-color: var(--dangerColor);
+    font-size: 1.2rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 10rem;
+    padding: 0.5rem;
+    color: var(--bgTertiaryColor);
+    cursor: pointer;
+}
+
+.wallmodal .content .dialog .topBar .spacer {
+    width: 1rem;
+    height: 1rem;
+    padding: 0.5rem;
+}
+
+.wallmodal .content .dialog .mainContent {
+    padding: 1rem;
+    background-color: var(--bgTertiaryColor);
+    border-radius: 1rem;
+}
+
+.setting {
+    padding-bottom: 2rem;
+}
+
+.setting .settingTitle, .settingButton {
+    text-align: center;
+    border: 1px solid var(--bgColor);
+    background-color: var(--bgSecondaryColor);
+    color: var(--textColor);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 1rem;
+    font-size: 1rem;
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+}
+
+.settingButton.success {
+    background-color: var(--successColor);
+}
+
+.settingButton.danger {
+    background-color: var(--dangerColor);
+}
+
+.settingButton {
+    margin: 0 2rem;
+    margin-bottom: 2rem;
+    color: var(--bgColor);
+    background-color: var(--accentColor);
+    width: 50%;
+}
+
+.settingButton:hover {
+    cursor: pointer;
+}
+
+.setting .settingInfo {
+    margin: 1rem;
+}
+
+.inputContainer {
+    display: flex;
+    align-items: center;
+    flex-direction: center;
+}
+
+.setting .inputContainer .error {
+    color: var(--dangerColor);
+    font-size: 0.8rem;
+    padding-left: 3rem;
+    padding-bottom: 1rem;
+}
+
+.setting .inputContainer .settingInput, select {
+    margin: 0.5rem;
+    background-color: var(--bgColor);
+    padding: 1rem;
+    border: none;
+    border-radius: 2rem;
+    color: var(--textColor);
+    outline-color: var(--textColor);
+    width: 80%;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: url('data:image/svg+xml;utf-8,<svg fill="%23C6D0F5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right var(--bgColor);
+    background-position: right 5% top 50%;
+}
+
+.setting .inputContainer .icon svg {
+    height: 25px;
+    width: 25px;
+}
+
 @media screen and (max-width: 90rem) {
     .mainContainer {
         width: 90vw;
@@ -82,6 +224,10 @@
 
     .sidebar {
         width: 22.5%;
+    }
+
+    .wallmodal .content .dialog {
+        width: 495px;
     }
 }
 
@@ -93,9 +239,34 @@
     .sidebar {
         width: 25%;
     }
+
+    .wallmodal .content .dialog {
+        width: 400px;
+    }
 }
 
 @media screen and (max-width: 70rem) {
+    .wallmodal .content {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        width: 80%;
+        margin: 0 auto;
+        padding: 10px 0;
+    }
+
+    .wallmodal .content img {
+        margin-right: unset;
+        height: 1080px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .wallmodal .content .dialog {
+        width: 100%;
+    }
+    
     .sidebar.opened {
         transform: unset;
         opacity: unset;
@@ -154,6 +325,11 @@
         width: 60%;
         border: none;
         background-color: var(--bgColorTr);
+    }
+    .wallmodal .content {
+        width: 90%;
+        margin: 0 auto;
+        padding: 10px 0;
     }
 }
 

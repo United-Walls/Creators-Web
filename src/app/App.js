@@ -9,12 +9,12 @@ import './App.css';
 import PrivateRouting from '../components/PrivateRouting/PrivateRouting';
 import Dashboard from '../screens/dashboard/Dashboard';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faDownload, faHeart, faHome, faImage, faLink, faList, faQuoteLeft, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faHeart, faHome, faImage, faLink, faList, faQuoteLeft, faUpload, faUser, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import Toast from '../components/Toast/Toast';
 
 library.add(
-  faHome, faList, faUpload, faUser, fab, faLink, faQuoteLeft, faImage, faDownload, faHeart
+  faHome, faList, faUpload, faUser, fab, faLink, faQuoteLeft, faImage, faDownload, faHeart, faXmark
 )
 
 const App = () => {

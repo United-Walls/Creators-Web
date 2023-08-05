@@ -3,7 +3,7 @@
     bottom: 0;
     right: 0;
     margin: 1rem;
-    z-index: 99;
+    z-index: 101;
     background-color: var(--accentColor);
     padding: 1rem;
     border: 1px solid var(--bgColor); 

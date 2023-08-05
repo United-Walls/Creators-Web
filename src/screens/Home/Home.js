@@ -3,12 +3,13 @@ import './Home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {ReactComponent as ThreadsIcon} from '../../assets/icons/threads.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadWallsAndUserAsync, toggleSidebar, updateProfileAsync, updateProfilePicAsync } from '../../features/dashboard/dashboardSlice';
+import { loadSelectedWallAsync, loadWallsAndUserAsync, toggleSidebar, updateProfileAsync, updateProfilePicAsync } from '../../features/dashboard/dashboardSlice';
 import { hasWhiteSpace, isValidUrl } from '../..';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
 import { useLocation } from 'react-router-dom';
 import { makeActive } from '../../features/page/pageSlice';
 import { Waypoint } from 'react-waypoint';
+import Loading from '../../components/Loading/Loading';
 
 const Home = () => {
   const userData = useSelector(state => ({username: state.dashboard.username, description: state.dashboard.description, id: state.auth.user.id, userPfp: state.dashboard.avatar_file_url, totalNoOfWalls: state.dashboard.totalNumberOfWalls, totalNoOfDownloadedWalls: state.dashboard.totalNumberOfDownloadedWalls, totalNoOfLikedWalls: state.dashboard.totalNumberOfLikedWalls, donationLinks: state.dashboard.donationLinks, socialMediaLinks: state.dashboard.socialMediaLinks}));
@@ -49,6 +50,19 @@ const Home = () => {
   const [otherSocialLink, setOtherSocialLink] = useState({title: "", link: ""});
   const [otherDonationLink, setOtherDonationLink] = useState({title: "", link: ""});
   const [errors, setErrors] = useState([]);
+
+  const [loadingPics, setLoadingPics] = useState(true);
+
+  const urls = ["", ""];
+
+  const counter = useRef(0);
+
+  const imageLoaded = () => {
+    counter.current += 1;
+    if (counter.current >= urls.length) {
+      setLoadingPics(false);
+    }
+  }
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -371,7 +385,7 @@ const Home = () => {
     e.preventDefault();
     if (!addOtherSocialLinkActive && !addOtherDonationLinkActive) {
       setTimeout(() => {
-        if (errors.length <= 0) {
+        if (!errors || errors.length <= 0) {
           dispatch(updateProfileAsync(textInputs));
         } else {
           dispatch(showToast({ status: "error", message: "Well, I think you got some errors to deal with first, scroll up!" }));
@@ -392,38 +406,45 @@ const Home = () => {
       }}
       style={{cursor: `${sidebarOpened ? "pointer" : "default"}`}}
     >
-        <div className="headerImage">
-            {
-            walls && walls.length > 0
-            ?
-            <img src={walls[0].file_url} alt={walls[0].file_name} />
-            :
-            ""
-            }
+      { 
+      loadingPics
+      ?
+      <Loading />
+      :
+      ""
+      }
+      <div className="headerImage">
+          {
+          walls && walls.length > 0
+          ?
+          <img className={loadingPics ? 'loading' : undefined} src={walls[0].file_url} alt={walls[0].file_name} onLoad={imageLoaded} />
+          :
+          ""
+          }
+      </div>
+      <div className="userHeader">
+        <div className="userPfp">
+          <img className={loadingPics ? 'loading' : undefined} src={userData.userPfp} alt={userData.username} onLoad={imageLoaded} />
         </div>
-        <div className="userHeader">
-          <div className="userPfp">
-            <img src={userData.userPfp} alt={userData.username} />
-          </div>
-          <div className="userInfo">
-            <div className="username">@{userData.username}</div>
-            <div className="description">{userData.description}</div>
-            <div className="userDetails">
-              <div className="userDetail">
-                <div className="title">Wallpapers</div>
-                <div className="data">{userData.totalNoOfWalls}</div>
-              </div>
-              <div className="userDetail">
-                <div className="title">Liked</div>
-                <div className="data">{userData.totalNoOfLikedWalls}</div>
-              </div>
-              <div className="userDetail">
-                <div className="title">Downloaded</div>
-                <div className="data">{userData.totalNoOfDownloadedWalls}</div>
-              </div>
+        <div className={`userInfo${loadingPics ? ' loadingImage' : ""}`}>
+          <div className="username">@{userData.username}</div>
+          <div className="description">{userData.description}</div>
+          <div className="userDetails">
+            <div className="userDetail">
+              <div className="title">Wallpapers</div>
+              <div className="data">{userData.totalNoOfWalls}</div>
+            </div>
+            <div className="userDetail">
+              <div className="title">Liked</div>
+              <div className="data">{userData.totalNoOfLikedWalls}</div>
+            </div>
+            <div className="userDetail">
+              <div className="title">Downloaded</div>
+              <div className="data">{userData.totalNoOfDownloadedWalls}</div>
             </div>
           </div>
         </div>
+      </div>
         {
           page.filter(val => val.active)[0].name === "Home"
           ?
@@ -863,7 +884,10 @@ const Home = () => {
               walls.length > 0 && 
               walls.map((wall, index) => {
                 return (
-                  <div key={wall._id} id={wall._id} className={`wallpaper wall-${index + 1}`}>
+                  <div key={wall._id} id={wall._id} className={`wallpaper wall-${index + 1}`} onClick={(e) => {
+                    e.preventDefault();
+                    dispatch(loadSelectedWallAsync({wallId: wall._id}));
+                  }}>
                     <img src={wall.thumbnail_url} alt={wall.file_name} />
                     <div className="dataInfo">
                       <div className="data likes">
