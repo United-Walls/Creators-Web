@@ -5,7 +5,7 @@ import Loading from '../Loading/Loading';
 import Home from '../../screens/Home/Home';
 import SidebarItem from '../SidebarItem/SidebarItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { unselectWall, updateWallByIdAsync } from '../../features/dashboard/dashboardSlice';
+import { deleteWallByIdAsync, unselectWall, updateWallByIdAsync } from '../../features/dashboard/dashboardSlice';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
 
 const Sidebar = ({ username, userPfp, userId }) => {
@@ -186,7 +186,10 @@ const WallModal = () => {
                 </div>
                 <div className="inputContainer">
                   <button onClick={handleSubmit} className='settingButton success'>Save changes</button>
-                  <button className="settingButton danger">Delete Wall</button>
+                  <button className="settingButton danger" onClick={() => { 
+                    dispatch(deleteWallByIdAsync({ wallId: selectedWall._id } ));
+                    dispatch(unselectWall());
+                  }}>Delete Wall</button>
                 </div>
             </div>
           </div>

@@ -273,7 +273,9 @@ export const dashboardSlice = createSlice({
             })
             .addCase(uploadWallpaperAsync.fulfilled, (state, action) => {
                 state.status = 'idle';
-                console.log(action.payload);
+                action.payload.forEach(wall => {
+                    state.walls.unshift(wall);
+                })
             })
             .addCase(loadSelectedWallAsync.pending, (state) => {
                 state.status = 'loading';

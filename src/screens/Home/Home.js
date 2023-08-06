@@ -90,8 +90,12 @@ const Home = () => {
   }, [uploadProfilePic]);
 
   useEffect(() => {
-    if(categoryInput === "") {
+    if(categoryInput.trim().length === 0 || categoryInput === "") {
       setError(true);
+    } else if(categoryInput.trim().length <= 2) {
+      setError(true);
+    } else if(!(/^\w+\s*\w+?$/.test(categoryInput))) {
+      setError(true)
     } else {
       setError(false);
     }
@@ -1037,13 +1041,16 @@ const Home = () => {
                   </div>
                   <div className="settingInfo">Or you can just type a new Category, our Server will make it automatically</div>
                   <div className="inputContainer">
-                    <input placeholder="Category Name" type="text" name="categoryText" className="settingInput" value={categoryInput} onChange={(e) => {setCategoryInput(e.target.value)}} />
+                    <input placeholder="Category Name" type="text" name="categoryText" className="settingInput" value={categoryInput} onChange={(e) => {
+                      const re = /(\b[a-z](?!\s))/g;
+                      setCategoryInput(e.target.value.replace(re, (x) => x.toUpperCase()));
+                    }} />
                   </div>
                   {
                     error 
                     ?
                     <div className="inputContainer">
-                      <span className='error'>Error - You need to select a Category</span>
+                      <span className='error'>{categoryInput.trim().length <= 0 ? "Error - You need to select a Category" : categoryInput.trim().length <= 2 ? "Error - Category should be atleast more than 2 characters" : !(/^\w+\s*\w+?$/.test(categoryInput.trim())) ? "Error - you can only have a category with two words, or just one. For Example - One word Categories - Abstract, Two word Categories - Aerial View" : categoryInput.trim() === "" ? "Error - You need to select a Category" : ""}</span>
                     </div>
                     :
                     ""
@@ -1054,8 +1061,9 @@ const Home = () => {
                   className="settingButton" 
                   onClick={async (e) => {
                     e.preventDefault();
+                    console.log(categoryInput, wallpaperFiles);
                     const formData = new FormData();
-                    formData.append("categoryName", categoryInput)
+                    formData.append("categoryName", categoryInput.trim())
                     wallpaperFiles.forEach(file => {
                       console.log(file);
                       formData.append("walls", file);
