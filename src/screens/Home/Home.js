@@ -3,7 +3,7 @@ import './Home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {ReactComponent as ThreadsIcon} from '../../assets/icons/threads.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadSelectedWallAsync, loadWallsAndUserAsync, toggleSidebar, updateProfileAsync, updateProfilePicAsync } from '../../features/dashboard/dashboardSlice';
+import { loadSelectedWallAsync, loadWallsAndUserAsync, toggleSidebar, updateProfileAsync, updateProfilePicAsync, uploadWallpaperAsync } from '../../features/dashboard/dashboardSlice';
 import { hasWhiteSpace, isValidUrl } from '../..';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
 import { useLocation } from 'react-router-dom';
@@ -16,6 +16,7 @@ const Home = () => {
 
   const wallData = useSelector(state => state.dashboard.walls);
   const wallPage = useSelector(state => state.dashboard.page);
+  const categories = useSelector(state => state.dashboard.categories);
   const [walls, setWalls] = useState();
 
   useEffect(() => {
@@ -23,6 +24,7 @@ const Home = () => {
   }, [wallData]);
 
   const fileRef = useRef(null);
+  const wallRef = useRef(null);
   const location = useLocation();
   const page = useSelector(state => state.pages);
   const sidebarOpened = useSelector(state => state.dashboard.sidebarOpened);
@@ -44,12 +46,14 @@ const Home = () => {
                                         otherdonations: userData.donationLinks.otherdonations ?? []
                                       });
   const [uploadProfilePic, setUploadProfilePic] = useState();
-
+  const [wallpaperFiles, setWallpaperFiles] = useState([])
   const [addOtherSocialLinkActive, setAddOtherSocialLinkActive] = useState(false);
   const [addOtherDonationLinkActive, setAddOtherDonationLinkActive] = useState(false);
   const [otherSocialLink, setOtherSocialLink] = useState({title: "", link: ""});
   const [otherDonationLink, setOtherDonationLink] = useState({title: "", link: ""});
   const [errors, setErrors] = useState([]);
+  const [categoryInput, setCategoryInput] = useState("");
+  const [error, setError] = useState(false);
 
   const [loadingPics, setLoadingPics] = useState(true);
 
@@ -86,6 +90,12 @@ const Home = () => {
   }, [uploadProfilePic]);
 
   useEffect(() => {
+    if(categoryInput === "") {
+      setError(true);
+    } else {
+      setError(false);
+    }
+
     if(textInputs.username === "") {
       setErrors((state) => {
         let newState = state;
@@ -339,7 +349,7 @@ const Home = () => {
         }
       }
     }
-  }, [textInputs])
+  }, [textInputs, categoryInput])
 
   const handleInputChange = (e) => {
     setTextInputs((state) => {
@@ -399,7 +409,6 @@ const Home = () => {
     <div
       className={`page ${page.filter(val => val.active)[0].name.toLowerCase()}`} 
       onClick={(e) => {
-        e.preventDefault();
         if (sidebarOpened) {
           dispatch(toggleSidebar());
         }
@@ -867,7 +876,7 @@ const Home = () => {
                   }
                   <button className='settingButton' onClick={() => setAddOtherDonationLinkActive(state => !state)}>Add other links</button>
                 </div>
-                <button className='settingButton success' type='submit'>Save</button>
+                <button disabled={errors || errors.length > 0} className='settingButton success' type='submit'>Save</button>
               </form>
             </div>
           )
@@ -917,6 +926,149 @@ const Home = () => {
               }} />
             </div>
           )
+          :
+          ""
+        }
+        {
+          page.filter(val => val.active)[0].name === "Upload"
+          ?
+          <div className="setting">
+            <div className="settingTitle">Upload Wallpaper</div>
+            <div className="settingInfo">Upload a wallpaper</div>
+            <input 
+              type="file" 
+              ref={wallRef} 
+              style={{display: "none"}} 
+              multiple
+              accept='image/*'
+              onChange={(e) => {
+                const files = e.target.files;
+                setWallpaperFiles(state => {
+                  let newState = state;
+                  for(let i = 0; i < files.length; i++) {
+                    newState.push(files[i]);
+                  }
+                  return newState;
+                });
+              }} 
+            />
+            <div 
+              className="dropZone big"
+              onClick={(e) => {
+                wallRef.current.click();
+              }}
+              onDrop={(e) => {
+                console.log("File(s) dropped");
+                // Prevent default behavior (Prevent file from being opened)
+                e.preventDefault();
+              
+                if (e.dataTransfer.items) {
+                  // Use DataTransferItemList interface to access the file(s)
+                  [...e.dataTransfer.items].forEach((item, i) => {
+                    // If dropped items aren't files, reject them
+                    if (item.kind === "file") {
+                      const file = item.getAsFile();
+                      setWallpaperFiles(state => {
+                        let newState = state;
+                        newState.push(file);
+                        return newState
+                      });
+                    }
+                  });
+                } else {
+                  // Use DataTransfer interface to access the file(s)
+                  [...e.dataTransfer.files].forEach((file, i) => {
+                    setUploadProfilePic(state => {
+                      let newState = state;
+                      newState.push(file);
+                      return newState
+                    });
+                  });
+                }}}
+                onDragOver={(e) => {
+                  console.log("File(s) in drop zone");
+
+                  // Prevent default behavior (Prevent file from being opened)
+                  e.preventDefault();
+                }}
+              >
+                <div className="row">
+                  <FontAwesomeIcon icon="image" />
+                  <span>Click or drag files here to upload.</span>
+                </div>
+            </div>
+            <br />
+            <br />
+            {
+              wallpaperFiles && wallpaperFiles.length > 0
+              ?
+              <>
+                <div className="settingInfo">Clicking on the image, will remove from the uploads.</div>
+                <div className="wallpapers">
+                  <div className="wallpaperGrid">
+                  {
+                    wallpaperFiles.map((file, index) => {
+                      return <div key={index} className="wallpaper" onClick={(e) => {
+                        e.preventDefault();
+                        setWallpaperFiles(state => state.filter(st => st !== file))
+                      }}> 
+                        <span><FontAwesomeIcon icon="xmark" /></span>
+                        <img src={URL.createObjectURL(file)} alt={file.name} />
+                      </div>
+                    })
+                  }
+                  </div>
+                </div>
+                <div className="setting">
+                  <div className="settingInfo">Choose a category for {wallpaperFiles.length > 1 ? "all these wallpapers" : "this wallpaper"}. {wallpaperFiles.length > 1 ? "Remember all these wallpapers will have to be the same category you choose. If you want to choose another category, upload these first, then upload the others with the new category." : ""}</div>
+                  <div className="inputContainer">
+                    <select name="category" id="" value={ categoryInput } onChange={(e) => {setCategoryInput(e.target.value)}}>
+                      <option value="">Select Category</option>
+                      {
+                        categories && categories.length > 0
+                        ?
+                        categories.map(category => {
+                          return <option key={category._id} value={category.name}>{category.name}</option>
+                        })
+                        :
+                        ""
+                      }
+                    </select>
+                  </div>
+                  <div className="settingInfo">Or you can just type a new Category, our Server will make it automatically</div>
+                  <div className="inputContainer">
+                    <input placeholder="Category Name" type="text" name="categoryText" className="settingInput" value={categoryInput} onChange={(e) => {setCategoryInput(e.target.value)}} />
+                  </div>
+                  {
+                    error 
+                    ?
+                    <div className="inputContainer">
+                      <span className='error'>Error - You need to select a Category</span>
+                    </div>
+                    :
+                    ""
+                  }
+                </div>
+                <button 
+                  disabled={error}
+                  className="settingButton" 
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData();
+                    formData.append("categoryName", categoryInput)
+                    wallpaperFiles.forEach(file => {
+                      console.log(file);
+                      formData.append("walls", file);
+                    })
+                    dispatch(uploadWallpaperAsync(formData));
+                    setWallpaperFiles([]);
+                  }}
+                >Upload</button>
+              </>
+              :
+              ""
+            }
+          </div>
           :
           ""
         }

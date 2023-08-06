@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchUserData, fetchUserDownloadedWallsCount, fetchUserDownloadedWallsData, fetchUserLikedWallsCount, fetchUserLikedWallsData, fetchUserWallCount } from "../user/userApi";
 import { updateProfile, updateProfilePic } from "../profile/profileAPI";
 import { hideToast, showToast } from "../toast/toastSlice";
-import { deleteWallById, fetchWallByID, updateWallById } from "../wall/wallAPI";
+import { deleteWallById, fetchWallByID, updateWallById, uploadWall } from "../wall/wallAPI";
 import { fetchCategories } from "../categories/categoriesAPI";
 
 const initialState = {
@@ -148,7 +148,7 @@ export const updateProfilePicAsync = createAsyncThunk(
         const updatedData = await updateProfilePic(formData);
         if (updatedData && updatedData.error) {
             if (updatedData.code === 413) {
-                dispatch(showToast({ status: "error", message: "Bro, Image size is too much, should be less than 10 MB!"}));
+                dispatch(showToast({ status: "error", message: "Bro, Image size is too big, should be less than 10 MB!"}));
             } else {
                 dispatch(showToast({ status: "error", message: "Oops, could not upload!"}));
             }
@@ -158,6 +158,31 @@ export const updateProfilePicAsync = createAsyncThunk(
             dispatch(showToast({ status: "success", message: "Uploaded Successfully"}));
             setTimeout(() => dispatch(hideToast()), 3000);
             return updatedData;
+        }
+    }
+)
+
+export const uploadWallpaperAsync = createAsyncThunk(
+    'dashboard/uploadWallpaper',
+    async (formData, { dispatch, rejectWithValue }) => {
+        const uploadedWall = await uploadWall(formData);
+        let walls = [];
+        if (uploadedWall && uploadedWall.error) {
+            if (uploadedWall.code === 413) {
+                dispatch(showToast({ status: "error", message: "Bro, Image size is too big, should be less than 10 MB!"}));
+            } else {
+                dispatch(showToast({ status: "error", message: "Oops, could not upload!"}));
+            }
+            setTimeout(() => dispatch(hideToast()), 5000);
+            return rejectWithValue('Could not upload');
+        } else {
+            dispatch(showToast({ status: "success", message: "Uploaded Successfully"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            for(let i = 0; i < uploadedWall.length; i++) {
+                let wall = await fetchWallByID({ wallId: uploadedWall[0].wall });
+                walls.push(wall);
+            }
+            return walls;
         }
     }
 )
@@ -239,6 +264,16 @@ export const dashboardSlice = createSlice({
 
                 state.status = 'idle';
                 state.avatar_file_url = avatar_file_url;
+            })
+            .addCase(uploadWallpaperAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(uploadWallpaperAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(uploadWallpaperAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                console.log(action.payload);
             })
             .addCase(loadSelectedWallAsync.pending, (state) => {
                 state.status = 'loading';

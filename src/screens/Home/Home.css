@@ -79,7 +79,7 @@
     width: 100%;
 }
 
-.home .userSettings .setting {
+.setting {
     display: flex;
     flex-direction: column;
     margin-left: 2rem;
@@ -92,11 +92,11 @@
     flex-basis: 1;
 }
 
-.home .userSettings .setting .settingTitle, .home .userSettings .setting .settingInfo, .home .userSettings .setting .inputContainer {
+.setting .settingTitle, .setting .settingInfo, .setting .inputContainer {
     width: 80%;
 }
 
-.home .userSettings .setting .dropZone {
+.setting .dropZone {
     background-color: var(--bgColor);
     padding: 1rem;
     width: 75%;
@@ -108,15 +108,15 @@
     align-items: center;
 }
 
-.home .userSettings .setting .dropZone.big {
+.setting .dropZone.big {
     height: 100px;
 }
 
-.home .userSettings .setting .dropZone .imageContainer {
+.setting .dropZone .imageContainer {
     margin-top: 1rem;
 }
 
-.home .userSettings .setting .dropZone .imageContainer img {
+.setting .dropZone .imageContainer img {
     width: 200px;
     height: 200px;
     border-radius: 2rem;
@@ -124,22 +124,22 @@
     box-shadow: 0px 15px 20px -8px var(--bgColorTr);
 }
 
-.home .userSettings .setting .dropZone .row {
+.setting .dropZone .row {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.home .userSettings .setting .dropZone:hover {
+.setting .dropZone:hover {
     cursor: pointer;
 }
 
-.home .userSettings .setting .dropZone svg {
+.setting .dropZone svg {
     font-size: 3rem;
     margin-right: 1rem;
 }
 
-.home .userSettings .setting .file {
+.setting .file {
     padding: 1rem 0;
 }
 
