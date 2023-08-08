@@ -186,7 +186,7 @@ export const uploadWallpaperAsync = createAsyncThunk(
                 console.log(wall);
                 if (wall.wall.hidden === true) {
                     approvalWalls.push(wall);
-                } else if (wall.hidden === true) {
+                } else {
                     walls.push(wall);
                 }
             }
