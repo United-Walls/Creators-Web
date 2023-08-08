@@ -10,6 +10,7 @@ import { hideToast, showToast } from '../../features/toast/toastSlice';
 
 const Sidebar = ({ username, userPfp, userId }) => {
   const sidebarOpened = useSelector((state => state.dashboard.sidebarOpened));
+  const user = useSelector(state => state.auth.user);
   const pages = useSelector(state => state.pages);
   const [userPFPLoading, setUserPFPLoading] = useState(true);
 
@@ -20,23 +21,40 @@ const Sidebar = ({ username, userPfp, userId }) => {
   return (
     <div className={`${sidebarOpened ? "sidebar opened" : "sidebar"}`}>
       { 
-      userPFPLoading
+      userPfp && userPFPLoading
       ?
       <Loading />
       :
       ""
       }
       <div className="userContainer">
-        <img className={userPFPLoading ? "loading" : undefined} src={userPfp} alt={username} onLoad={imageLoaded} />
-        <div className={`userData${userPFPLoading ? ' loadingImage' : ""}`}>
-          <span>@{username}</span>
+        {
+          userPfp ? 
+          <img className={userPfp && userPFPLoading ? "loading" : undefined} src={userPfp} alt={username} onLoad={imageLoaded} />
+          :
+          ""
+        }
+        <div className={`userData${userPfp && userPFPLoading ? ' loadingImage' : ""}`}>
+          <span>
+            @{username} 
+            {
+              user.userID === 975024565
+              || user.userID === 934949695
+              || user.userID === 1889905927 
+              || user.userID === 127070302
+              ?
+              <span className="adminLabel">Admin</span>
+              :
+              ""
+            }
+          </span>
           <span>User ID - {userId}</span>
         </div>
       </div>
-      <div className={`sidebarItems${userPFPLoading ? ' loadingImage' : ""}`}>
+      <div className={`sidebarItems${userPfp && userPFPLoading ? ' loadingImage' : ""}`}>
         {
           pages && pages.length > 0 && pages.map((page, index) => {
-            return <SidebarItem key={index} name={page.name} icon={page.icon} active={page.active} />
+            return <SidebarItem key={index} name={page.name} icon={page.icon} active={page.active} special={page.special} />
           })
         }
       </div>
@@ -45,11 +63,24 @@ const Sidebar = ({ username, userPfp, userId }) => {
 }
 
 const Content = () => {
+  const userData = useSelector(state => ({username: state.dashboard.username, description: state.dashboard.description, id: state.auth.user.id, userPfp: state.dashboard.avatar_file_url, totalNoOfWalls: state.dashboard.totalNumberOfWalls, totalNoOfDownloadedWalls: state.dashboard.totalNumberOfDownloadedWalls, totalNoOfLikedWalls: state.dashboard.totalNumberOfLikedWalls, donationLinks: state.dashboard.donationLinks, socialMediaLinks: state.dashboard.socialMediaLinks}));
+
   return (
     <div className="content">
       <div className="placeholderContent"></div>
       <div className="wrapper">
-        <Home />
+        {
+        userData.username ?
+        <Home 
+          username={userData.username}
+          description={userData.description}
+          donationLinks={userData.donationLinks}
+          socialMediaLinks={userData.socialMediaLinks}
+        />
+        :
+        ""
+        }
+        
       </div>
     </div>
   )
@@ -205,12 +236,7 @@ const MainContainer = () => {
   return (
     <div className='mainContainer'> 
       <Sidebar username={dashboardData.username} userPfp={dashboardData.avatar_file_url} userId={dashboardData.userId} />
-      {
-        dashboardData && dashboardData.walls.length > 0 ?
-        <Content />
-        :
-        ""
-      }
+      <Content />
       {
         dashboardData && dashboardData.selectedWall 
         ?

@@ -43,3 +43,13 @@ export const uploadWall = async (formData) => {
         return { error: true, code: err.response.status };
     }
 }
+
+export const getApprovalWalls = async ({ userId }) => {
+    try {
+        const response = await api.get(`creators/approvals/creator?userId=${userId}`);
+        return response.data;
+    } catch(err) {
+        console.error('DEBUG - ', err);
+        return { error: true, code: err.response.status };
+    }
+}

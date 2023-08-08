@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchUserData, fetchUserDownloadedWallsCount, fetchUserDownloadedWallsData, fetchUserLikedWallsCount, fetchUserLikedWallsData, fetchUserWallCount } from "../user/userApi";
 import { updateProfile, updateProfilePic } from "../profile/profileAPI";
 import { hideToast, showToast } from "../toast/toastSlice";
-import { deleteWallById, fetchWallByID, updateWallById, uploadWall } from "../wall/wallAPI";
+import { deleteWallById, fetchWallByID, getApprovalWalls, updateWallById, uploadWall } from "../wall/wallAPI";
 import { fetchCategories } from "../categories/categoriesAPI";
 
 const initialState = {
@@ -11,6 +11,7 @@ const initialState = {
     description: "",
     avatar_file_url: "",
     walls: [],
+    approvalWalls: [],
     likedWalls: [],
     downloadedWalls: [],
     page: 0,
@@ -89,6 +90,7 @@ export const loadWallsAndUserAsync = createAsyncThunk(
     async ({userId, page}, { dispatch, rejectWithValue }) => {
         const userData = await fetchUserData({ userId, page });
         const categories = await fetchCategories();
+        const approvalWalls = await getApprovalWalls({ userId });
         console.log(userData);
         const count = await fetchUserWallCount({ userId });
         if (userData && userData.error) {
@@ -96,7 +98,7 @@ export const loadWallsAndUserAsync = createAsyncThunk(
             setTimeout(() => dispatch(hideToast()), 3000);
             rejectWithValue("rejected");
         }
-        return { userData, categories, count };
+        return { userData, categories, count, approvalWalls };
     }
 );
 
@@ -166,7 +168,8 @@ export const uploadWallpaperAsync = createAsyncThunk(
     'dashboard/uploadWallpaper',
     async (formData, { dispatch, rejectWithValue }) => {
         const uploadedWall = await uploadWall(formData);
-        let walls = [];
+        let approvalWalls = []
+        let walls = []
         if (uploadedWall && uploadedWall.error) {
             if (uploadedWall.code === 413) {
                 dispatch(showToast({ status: "error", message: "Bro, Image size is too big, should be less than 10 MB!"}));
@@ -179,10 +182,15 @@ export const uploadWallpaperAsync = createAsyncThunk(
             dispatch(showToast({ status: "success", message: "Uploaded Successfully"}));
             setTimeout(() => dispatch(hideToast()), 3000);
             for(let i = 0; i < uploadedWall.length; i++) {
-                let wall = await fetchWallByID({ wallId: uploadedWall[0].wall });
-                walls.push(wall);
+                let wall = uploadedWall[i];
+                console.log(wall);
+                if (wall.wall.hidden === true) {
+                    approvalWalls.push(wall);
+                } else if (wall.hidden === true) {
+                    walls.push(wall);
+                }
             }
-            return walls;
+            return { walls, approvalWalls };
         }
     }
 )
@@ -207,7 +215,7 @@ export const dashboardSlice = createSlice({
                 state.status = 'idle';
             })
             .addCase(loadWallsAndUserAsync.fulfilled, (state, action) => {
-                const { userData, categories, count } = action.payload;
+                const { userData, categories, count, approvalWalls } = action.payload;
                 state.status = 'idle';
                 state.username = userData.username ? userData.username : state.username;
                 state.page = state.page + 1;
@@ -219,6 +227,7 @@ export const dashboardSlice = createSlice({
                 state.donationLinks = userData.donationLinks ? userData.donationLinks : state.donationLinks;
                 state.socialMediaLinks = userData.socialMediaLinks ? userData.socialMediaLinks : state.socialMediaLinks;
                 state.categories = categories;
+                state.approvalWalls = approvalWalls;
             })
             .addCase(loadLikedWallsAsync.pending, (state) => {
                 state.status = 'loading';
@@ -273,8 +282,12 @@ export const dashboardSlice = createSlice({
             })
             .addCase(uploadWallpaperAsync.fulfilled, (state, action) => {
                 state.status = 'idle';
-                action.payload.forEach(wall => {
+                const { walls, approvalWalls } = action.payload;
+                walls.forEach(wall => {
                     state.walls.unshift(wall);
+                });
+                approvalWalls.forEach(wall => {
+                    state.approvalWalls.unshift(wall);
                 })
             })
             .addCase(loadSelectedWallAsync.pending, (state) => {

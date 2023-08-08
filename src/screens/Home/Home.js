@@ -6,22 +6,30 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadSelectedWallAsync, loadWallsAndUserAsync, toggleSidebar, updateProfileAsync, updateProfilePicAsync, uploadWallpaperAsync } from '../../features/dashboard/dashboardSlice';
 import { hasWhiteSpace, isValidUrl } from '../..';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { makeActive } from '../../features/page/pageSlice';
 import { Waypoint } from 'react-waypoint';
 import Loading from '../../components/Loading/Loading';
 
-const Home = () => {
+const Home = ({username, description, donationLinks, socialMediaLinks}) => {
+  const userID = useSelector(state => state.auth.user.userID);
+  const navigate = useNavigate();
   const userData = useSelector(state => ({username: state.dashboard.username, description: state.dashboard.description, id: state.auth.user.id, userPfp: state.dashboard.avatar_file_url, totalNoOfWalls: state.dashboard.totalNumberOfWalls, totalNoOfDownloadedWalls: state.dashboard.totalNumberOfDownloadedWalls, totalNoOfLikedWalls: state.dashboard.totalNumberOfLikedWalls, donationLinks: state.dashboard.donationLinks, socialMediaLinks: state.dashboard.socialMediaLinks}));
 
   const wallData = useSelector(state => state.dashboard.walls);
   const wallPage = useSelector(state => state.dashboard.page);
+  const approvedWallsData = useSelector(state => state.dashboard.approvalWalls)
   const categories = useSelector(state => state.dashboard.categories);
   const [walls, setWalls] = useState();
+  const [approvedWalls, setApprovedWalls] = useState();
 
   useEffect(() => {
     setWalls(state => wallData);
   }, [wallData]);
+
+  useEffect(() => {
+    setApprovedWalls(state => approvedWallsData);
+  }, [approvedWallsData]);
 
   const fileRef = useRef(null);
   const wallRef = useRef(null);
@@ -45,6 +53,7 @@ const Home = () => {
                                         patreon: userData.donationLinks.patreon ?? "",
                                         otherdonations: userData.donationLinks.otherdonations ?? []
                                       });
+
   const [uploadProfilePic, setUploadProfilePic] = useState();
   const [wallpaperFiles, setWallpaperFiles] = useState([])
   const [addOtherSocialLinkActive, setAddOtherSocialLinkActive] = useState(false);
@@ -63,7 +72,13 @@ const Home = () => {
 
   const imageLoaded = () => {
     counter.current += 1;
-    if (counter.current >= urls.length) {
+    if (walls && walls.length > 0 && counter.current >= 1) {
+      setLoadingPics(false);
+    }
+    if (userData.userPfp && counter.current >= 1) {
+      setLoadingPics(false);
+    }
+    if (userData.userPfp && walls && walls.length > 0 && counter.current >= urls.length) {
       setLoadingPics(false);
     }
   }
@@ -71,6 +86,18 @@ const Home = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     switch(location.pathname) {
+      case "/dashboard/admin":
+        if (
+          userID === 975024565
+          || userID === 934949695
+          || userID === 1889905927 
+          || userID === 127070302
+        ) {
+          dispatch(makeActive({ name: "Admin" }));
+        } else {
+          navigate("/dashboard");
+        }
+        break;
       case "/dashboard/wallpapers":
         dispatch(makeActive({name: "Wallpapers"}));
         break;
@@ -83,7 +110,7 @@ const Home = () => {
         dispatch(makeActive({name: "Home"}));
         break;
     }
-  }, [location, dispatch]);
+  }, [userID, location, dispatch, navigate]);
 
   useEffect(() => {
     console.log(uploadProfilePic);
@@ -420,26 +447,36 @@ const Home = () => {
       style={{cursor: `${sidebarOpened ? "pointer" : "default"}`}}
     >
       { 
-      loadingPics
+      walls && walls.length > 0 && loadingPics
       ?
       <Loading />
       :
+      walls && walls.length > 0
+      ?
       ""
+      :
+      <div style={{height: "120px"}}></div>
       }
       <div className="headerImage">
           {
           walls && walls.length > 0
           ?
-          <img className={loadingPics ? 'loading' : undefined} src={walls[0].file_url} alt={walls[0].file_name} onLoad={imageLoaded} />
+          <img className={walls && walls.length > 0 && loadingPics ? 'loading' : undefined} src={walls[0].file_url} alt={walls[0].file_name} onLoad={imageLoaded} />
           :
           ""
           }
       </div>
       <div className="userHeader">
         <div className="userPfp">
-          <img className={loadingPics ? 'loading' : undefined} src={userData.userPfp} alt={userData.username} onLoad={imageLoaded} />
+          {
+            userData.userPfp > 0 && loadingPics
+            ?
+            <img className={userData.userPfp && loadingPics ? 'loading' : undefined} src={userData.userPfp} alt={userData.username} onLoad={imageLoaded} />
+            :
+            ""
+          }
         </div>
-        <div className={`userInfo${loadingPics ? ' loadingImage' : ""}`}>
+        <div className={`userInfo${userData.userPfp > 0 && loadingPics ? ' loadingImage' : ""}`}>
           <div className="username">@{userData.username}</div>
           <div className="description">{userData.description}</div>
           <div className="userDetails">
@@ -714,6 +751,13 @@ const Home = () => {
                           <div key={index} className="inputContainer">
                             <div className="icon"><FontAwesomeIcon icon="link" /></div>
                             <input placeholder={textInputs.other[index].title} type="text" name={textInputs.other[index].title} className="settingInput" value={textInputs.other[index].link} onChange={handleOtherSocialMediaInputChange} />
+                            <div className="deleteIcon" onClick={(e) => {
+                              e.preventDefault();
+                              setTextInputs(state => {
+                                let others = state.other.filter(ot => ot.title !== textInputs.other[index].title);
+                                return { ...state, other: others };
+                              })
+                            }}><FontAwesomeIcon icon="xmark" /></div>
                           </div>
                           {
                             errors && errors.length > 0 && errors.map(error => {
@@ -818,6 +862,13 @@ const Home = () => {
                           <div key={index} className="inputContainer">
                             <div className="icon"><FontAwesomeIcon icon="link" /></div>
                             <input placeholder={textInputs.otherdonations[index].title} type="text" name={textInputs.otherdonations[index].title} className="settingInput" value={textInputs.otherdonations[index].link} onChange={handleOtherDonationInputChange} />
+                            <div className="deleteIcon" onClick={(e) => {
+                              e.preventDefault();
+                              setTextInputs(state => {
+                                let others = state.otherdonations.filter(ot => ot.title !== textInputs.otherdonations[index].title);
+                                return { ...state, otherdonations: others };
+                              })
+                            }}><FontAwesomeIcon icon="xmark" /></div>
                           </div>
                           {
                             errors && errors.length > 0 && errors.map(error => {
@@ -891,7 +942,35 @@ const Home = () => {
           page.filter(val => val.active)[0].name === "Wallpapers"
           ?
           (
-            <div className="wallpaperGrid">
+            <>
+              {
+                approvedWalls && 
+                approvedWalls.length > 0
+                ?
+                (
+                  <>
+                  <h1><center>{approvedWalls && approvedWalls.length > 0 ? "Walls needing Approval" : ""}</center></h1>
+                  <div className="wallpaperGrid">
+                    {
+                      approvedWalls && 
+                      approvedWalls.length > 0 && 
+                      approvedWalls.map((wall, index) => {
+                        return (
+                          <div key={wall.wall._id} id={wall.wall._id} className={`wallpaper wall-${index + 1}`}>
+                            <img src={wall.wall.file_url} alt={wall.wall.file_name} />
+                            <span>{ wall.wall.file_name }</span>
+                          </div>
+                        )
+                      })
+                    }
+                  </div>
+                  </>
+                )
+                :
+                ""
+              }
+              <h1><center>{walls && walls.length > 0 ? "Uploaded Walls" : ""}</center></h1>
+              <div className="wallpaperGrid">
               {
               walls && 
               walls.length > 0 && 
@@ -929,6 +1008,7 @@ const Home = () => {
                 }
               }} />
             </div>
+            </>
           )
           :
           ""
@@ -1076,6 +1156,26 @@ const Home = () => {
               :
               ""
             }
+          </div>
+          :
+          ""
+        }
+        {
+          page.filter(val => val.active)[0].name === "Admin"
+          ?
+          <div className="setting">
+            <div className="pageButton">
+              <span>Wall Categories</span>
+              <FontAwesomeIcon icon="circle-chevron-right" />
+            </div>
+            <div className="pageButton">
+              <span>Edit Creators</span>
+              <FontAwesomeIcon icon="circle-chevron-right" />
+            </div>
+            <div className="pageButton">
+              <span>Invitation Codes</span>
+              <FontAwesomeIcon icon="circle-chevron-right" />
+            </div>
           </div>
           :
           ""

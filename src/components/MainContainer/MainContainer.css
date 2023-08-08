@@ -38,6 +38,13 @@
     box-shadow: 0px 15px 20px -8px var(--bgColorTr);
 }
 
+.userContainer .userData .adminLabel {
+    background-color: var(--bgColorTr);
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
+    margin-left: 1rem;
+}
+
 .userContainer .userData span:first-child {
     font-weight: bolder;
 }
