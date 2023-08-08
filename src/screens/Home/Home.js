@@ -468,7 +468,8 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
       </div>
       <div className="userHeader">
         <div className="userPfp">
-          <img className={userData.userPfp && loadingPics ? 'loading' : undefined} src={userData.userPfp} alt={userData.username} onLoad={imageLoaded} />
+          {userData.userPfp
+          ?<img className={userData.userPfp && loadingPics ? 'loading' : undefined} src={userData.userPfp} alt={userData.username} onLoad={imageLoaded} />:""}
         </div>
         <div className={`userInfo${userData.userPfp > 0 && loadingPics ? ' loadingImage' : ""}`}>
           <div className="username">@{userData.username}</div>
