@@ -88,7 +88,7 @@ const Content = () => {
 
 const WallModal = () => {
   const selectedWall = useSelector(state => state.dashboard.selectedWall);
-  const categories = useSelector(state => state.dashboard.categories);
+  const categories = useSelector(state => state.dashboard.extras.categories);
   const dispatch = useDispatch();
   const [loadingImage, setLoadingImage] = useState(true);
 

@@ -96,7 +96,7 @@
 }
 
 .setting .dropZone {
-    background-color: var(--bgColor);
+    background-color: var(--accentColor);
     padding: 1rem;
     width: 75%;
     border-radius: 2rem;
@@ -105,6 +105,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    color: var(--bgColor)
 }
 
 .setting .dropZone.big {
@@ -140,6 +141,48 @@
 
 .setting .file {
     padding: 1rem 0;
+}
+
+.categories .categoryGrid {
+    display: grid;
+    padding: 2rem;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+    transform-origin: top;
+    animation: 500ms ease 0s 1 slideFromTop;
+}
+
+.categories .categoryGrid .category {
+    position: relative;
+    cursor: pointer;
+}
+
+.categories .categoryGrid .category span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--bgColorTr);
+    backdrop-filter: blur(20px);
+    padding: 1rem;
+    border-radius: 1rem;
+    text-align: center;
+}
+
+.categories .categoryGrid .category img {
+    object-fit: cover;
+    width: 330px;
+    height: 180px;
+    border-radius: 1rem;
+    box-shadow: 0px 15px 20px -8px var(--bgColorTr);
+    text-shadow: 0px 15px 20px -8px var(--bgColor);
+    transition: filter 250ms ease;
+}
+
+.categories .categoryGrid .category:hover img {
+    filter: brightness(0.2);
 }
 
 .wallpapers .wallpaperGrid {
@@ -243,6 +286,11 @@
     .wallpapers .wallpaperGrid {
         grid-template-columns: auto auto auto;
     }
+
+    .categories .categoryGrid .category img {
+        width: 200px;
+        height: 100px;
+    }
 }
 
 @media screen and (max-width: 45rem) {
@@ -279,6 +327,11 @@
 }
 
 @media screen and (max-width: 25rem){
+    .categories .categoryGrid .category img {
+        width: 150px;
+        height: 50px;
+    }
+
     .page .userHeader .userInfo .userDetails .userDetail {
         padding: 0.25rem;
     }

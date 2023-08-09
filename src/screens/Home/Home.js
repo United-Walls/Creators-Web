@@ -3,7 +3,7 @@ import './Home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {ReactComponent as ThreadsIcon} from '../../assets/icons/threads.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadSelectedWallAsync, loadWallsAndUserAsync, toggleSidebar, updateProfileAsync, updateProfilePicAsync, uploadWallpaperAsync } from '../../features/dashboard/dashboardSlice';
+import { getCategoryByIdAsync, loadSelectedWallAsync, loadWallsAndUserAsync, toggleSidebar, unselectCategory, updateProfileAsync, updateProfilePicAsync, uploadWallpaperAsync } from '../../features/dashboard/dashboardSlice';
 import { hasWhiteSpace, isValidUrl } from '../..';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -15,11 +15,12 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
   const userID = useSelector(state => state.auth.user.userID);
   const navigate = useNavigate();
   const userData = useSelector(state => ({username: state.dashboard.username, description: state.dashboard.description, id: state.auth.user.id, userPfp: state.dashboard.avatar_file_url, totalNoOfWalls: state.dashboard.totalNumberOfWalls, totalNoOfDownloadedWalls: state.dashboard.totalNumberOfDownloadedWalls, totalNoOfLikedWalls: state.dashboard.totalNumberOfLikedWalls, donationLinks: state.dashboard.donationLinks, socialMediaLinks: state.dashboard.socialMediaLinks}));
+  const extras = useSelector(state => state.dashboard.extras);
 
   const wallData = useSelector(state => state.dashboard.walls);
   const wallPage = useSelector(state => state.dashboard.page);
   const approvedWallsData = useSelector(state => state.dashboard.approvalWalls)
-  const categories = useSelector(state => state.dashboard.categories);
+  const categories = useSelector(state => state.dashboard.extras.categories);
   const [walls, setWalls] = useState();
   const [approvedWalls, setApprovedWalls] = useState();
 
@@ -85,7 +86,12 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
   
   useEffect(() => {
     window.scrollTo(0, 0);
+    console.log(location)
     switch(location.pathname) {
+      case "/dashboard/admin/invites":
+      case "/dashboard/admin/creators":
+      case "/dashboard/admin/categories":
+      case "/dashboard/admin/approvals":
       case "/dashboard/admin":
         if (
           userID === 975024565
@@ -111,6 +117,22 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
         break;
     }
   }, [userID, location, dispatch, navigate]);
+
+  useEffect(() => {
+    if(location.pathname === '/dashboard/admin/categories' && location.search !== '') {
+      if (
+        userID === 975024565
+        || userID === 934949695
+        || userID === 1889905927 
+        || userID === 127070302
+      ) {
+        let categoryId = location.search.split('?id=')[1];
+        dispatch(getCategoryByIdAsync({ categoryId, page: extras.categoryWallsPage }));
+      } else {
+        navigate("/dashboard");
+      }
+    }
+  }, [location])
 
   useEffect(() => {
     console.log(uploadProfilePic);
@@ -1158,20 +1180,197 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
         {
           page.filter(val => val.active)[0].name === "Admin"
           ?
-          <div className="setting">
-            <div className="pageButton">
-              <span>Wall Categories</span>
-              <FontAwesomeIcon icon="circle-chevron-right" />
+            location.pathname === "/dashboard/admin"
+            ?
+            (<div className="setting">
+              <div className="pageButton" onClick={(e) => navigate('/dashboard/admin/approvals')}>
+                <span>Walls Approvement</span>
+                <FontAwesomeIcon icon="circle-chevron-right" />
+              </div>
+              <div className="pageButton" onClick={(e) => navigate('/dashboard/admin/categories')}>
+                <span>Wall Categories</span>
+                <FontAwesomeIcon icon="circle-chevron-right" />
+              </div>
+              <div className="pageButton" onClick={(e) => navigate('/dashboard/admin/creators')}>
+                <span>Edit Creators</span>
+                <FontAwesomeIcon icon="circle-chevron-right" />
+              </div>
+              <div className="pageButton" onClick={(e) => navigate('/dashboard/admin/invites')}>
+                <span>Invitation Codes</span>
+                <FontAwesomeIcon icon="circle-chevron-right" />
+              </div>
+            </div>)
+            :
+            ""
+          :
+          ""
+        }
+        {
+          page.filter(val => val.active)[0].name === "Admin"
+          ?
+            location.pathname === "/dashboard/admin/approvals"
+            ?
+            (
+            <div className="setting">
+              <div className="pageButton" onClick={(e) => navigate('/dashboard/admin')}>
+                <FontAwesomeIcon icon="circle-chevron-left" />
+                <span>Walls Approvement</span>
+                <span style={{width: "16px"}}></span>
+              </div>
             </div>
-            <div className="pageButton">
-              <span>Edit Creators</span>
-              <FontAwesomeIcon icon="circle-chevron-right" />
+            )
+            :
+            ""
+          :
+          ""
+        }
+        {
+          page.filter(val => val.active)[0].name === "Admin"
+          ?
+            location.pathname === "/dashboard/admin/categories"
+            ?
+              location.search === ''
+              ?
+              (
+                <div className="setting">
+                  <div className="pageButton" onClick={(e) => navigate('/dashboard/admin')}>
+                    <FontAwesomeIcon icon="circle-chevron-left" />
+                    <span>Wall Categories</span>
+                    <span style={{width: "16px"}}></span>
+                  </div>
+                  <div className="categories">
+                    <div className="categoryGrid">
+                      {
+                        categories && categories.length > 0
+                        ?
+                        categories.map((category, index) => {
+                          return category 
+                              ?
+                              (
+                                <div key={category._id} id={category._id} className={`category category-${index + 1}`} onClick={(e) => {
+                                  e.preventDefault();
+                                  navigate(`/dashboard/admin/categories?id=${category._id}`)
+                                }}>
+                                {
+                                  category.walls[0] && category.walls.length > 0 
+                                  ?
+                                  <img src={category.walls[0].thumbnail_url} alt={category.walls[0].file_name} />
+                                  :
+                                  ""
+                                }
+                                <span>{ category.name }</span>
+                              </div>
+                              )
+                              : 
+                              ""
+                            })
+                        :
+                        ""
+                      }
+                    </div>
+                  </div>
+                </div>
+              )
+              :
+              extras && extras.selectedCategory
+              ?
+                (
+                  
+                  <div className="setting">
+                    <div className="pageButton" onClick={(e) => {
+                      dispatch(unselectCategory());
+                      setTimeout(() => {
+                        navigate('/dashboard/admin/categories');
+                      }, 250)
+                    }}>
+                      <FontAwesomeIcon icon="circle-chevron-left" />
+                      <span>{extras.selectedCategory.name}</span>
+                      <span style={{width: "16px"}}></span>
+                    </div>
+                    <div className="wallpapers">
+                      <div className="wallpaperGrid">
+                      {
+                      extras.selectedCategory.walls && 
+                      extras.selectedCategory.walls.length > 0 && 
+                      extras.selectedCategory.walls.map((wall, index) => {
+                        return (
+                          <div key={wall._id} id={wall._id} className={`wallpaper wall-${index + 1}`} onClick={(e) => {
+                            e.preventDefault();
+                            dispatch(loadSelectedWallAsync({wallId: wall._id}));
+                          }}>
+                            <img src={wall.thumbnail_url} alt={wall.file_name} />
+                            <div className="dataInfo">
+                              <div className="data likes">
+                                <div className="icon">
+                                  <FontAwesomeIcon icon="heart" />
+                                </div>
+                                <div className="info">{ wall.timesFavourite }</div>
+                              </div>
+                              <div className="data downloads">
+                                <div className="icon">
+                                  <FontAwesomeIcon icon='download' />
+                                </div>
+                                <div className="info">{ wall.timesDownloaded }</div>
+                              </div>
+                            </div>
+                            <span>{ wall.file_name }</span>
+                          </div>
+                        )
+                      })
+                      }
+                      <Waypoint scrollableAncestor={window} onEnter={({ previousPosition, currentPosition, event }) => {
+                        if (extras.selectedCategory.walls.length < extras.totalNoOfCategoryWalls) {
+                          console.log(extras.selectedCategory.walls.length < extras.totalNoOfCategoryWalls, extras.selectedCategory.walls.length, extras.totalNoOfCategoryWalls);
+                          console.log("Get more walls");
+                          dispatch(getCategoryByIdAsync({ categoryId: extras.selectedCategory._id, page: extras.categoryWallsPage }));
+                        }
+                      }} />
+                      </div>
+                    </div>
+                  </div>
+                )
+              :
+                ""
+            :
+              ""
+          :
+            ""
+        }
+        {
+          page.filter(val => val.active)[0].name === "Admin"
+          ?
+            location.pathname === "/dashboard/admin/creators"
+            ?
+            (
+            <div className="setting">
+              <div className="pageButton" onClick={(e) => navigate('/dashboard/admin')}>
+                <FontAwesomeIcon icon="circle-chevron-left" />
+                <span>Edit Creators</span>
+                <span style={{width: "16px"}}></span>
+              </div>
             </div>
-            <div className="pageButton">
-              <span>Invitation Codes</span>
-              <FontAwesomeIcon icon="circle-chevron-right" />
+            )
+            :
+            ""
+          :
+          ""
+        }
+        {
+          page.filter(val => val.active)[0].name === "Admin"
+          ?
+            location.pathname === "/dashboard/admin/invites"
+            ?
+            (
+            <div className="setting">
+              <div className="pageButton" onClick={(e) => navigate('/dashboard/admin')}>
+                <FontAwesomeIcon icon="circle-chevron-left" />
+                <span>Invitation Codes</span>
+                <span style={{width: "16px"}}></span>
+              </div>
             </div>
-          </div>
+            )
+            :
+            ""
           :
           ""
         }

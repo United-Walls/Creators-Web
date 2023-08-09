@@ -3,7 +3,10 @@ import { fetchUserData, fetchUserDownloadedWallsCount, fetchUserDownloadedWallsD
 import { updateProfile, updateProfilePic } from "../profile/profileAPI";
 import { hideToast, showToast } from "../toast/toastSlice";
 import { deleteWallById, fetchWallByID, getApprovalWalls, updateWallById, uploadWall } from "../wall/wallAPI";
-import { fetchCategories } from "../categories/categoriesAPI";
+import { fetchCategories, fetchCategoryById, fetchCategoryWallCount } from "../categories/categoriesAPI";
+import { fetchCreators } from "../creators/creatorsAPI";
+import { fetchApprovals } from "../approvals/approvalsAPI";
+import { fetchInvites } from "../invites/invitesAPI";
 
 const initialState = {
     status: 'idle',
@@ -23,7 +26,6 @@ const initialState = {
     sidebarOpened: false,
     userId: "",
     selectedWall: null,
-    categories: [],
     socialMediaLinks: {
         twitter: "", 
         instagram: "", 
@@ -39,8 +41,55 @@ const initialState = {
         paypal: "",
         patreon: "" ,
         otherdonations: []
+    },
+    extras: {
+        creatorWallsPage: 0,
+        categoryWallsPage: 0,
+        totalNoOfCategoryWalls: 0,
+        totalNoOfCreatorWalls: 0,
+        selectedCreator: null,
+        selectedCategory: null,
+        selectedApproval: null,
+        creators: [],
+        invites: [],
+        approvals: [],
+        categories: [],
     }
 };
+
+export const getCategoryByIdAsync = createAsyncThunk(
+    'dashboard/getCategoryById',
+    async ({ categoryId, page }, { dispatch, rejectWithValue }) => {
+        const count = await fetchCategoryWallCount({ categoryId });
+        const categoryData = await fetchCategoryById({ categoryId, page });
+        return { categoryData, count };
+    }
+)
+
+export const getExtrasAsync = createAsyncThunk(
+    'dashboard/getExtras',
+    async (payload, { dispatch, rejectWithValue }) => {
+        const creators = await fetchCreators();
+        const approvals = await fetchApprovals();
+        const invites = await fetchInvites();
+        if (creators && creators.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        if (approvals && approvals.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        if (invites && invites.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        return { creators, approvals, invites }
+    }
+)
 
 export const deleteWallByIdAsync = createAsyncThunk(
     'dashboard/deleteWall',
@@ -94,6 +143,16 @@ export const loadWallsAndUserAsync = createAsyncThunk(
         console.log(userData);
         const count = await fetchUserWallCount({ userId });
         if (userData && userData.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        if (categories && categories.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        if (approvalWalls && approvalWalls.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
             rejectWithValue("rejected");
@@ -171,8 +230,8 @@ export const uploadWallpaperAsync = createAsyncThunk(
         let approvalWalls = []
         let walls = []
         if (uploadedWall && uploadedWall.error) {
-            if (uploadedWall.code === 413) {
-                dispatch(showToast({ status: "error", message: "Bro, Image size is too big, should be less than 10 MB!"}));
+            if (uploadedWall.code === 413 || uploadedWall.code === 502) {
+                dispatch(showToast({ status: "error", message: "Bro, either Image size is too big or your sum total of image sizes is too big, should be less than 10 MB!"}));
             } else {
                 dispatch(showToast({ status: "error", message: "Oops, could not upload!"}));
             }
@@ -204,6 +263,20 @@ export const dashboardSlice = createSlice({
         },
         unselectWall: (state) => {
             state.selectedWall = null;
+        },
+        unselectCategory: (state) => {
+            console.log("unselectCategory")
+            state.extras.selectedCategory = null;
+            state.extras.categoryWallsPage = 0;
+            state.extras.totalNoOfCategoryWalls = 0;
+        },
+        unselectCreator: (state) => {
+            state.extras.selectedCreator = null;
+            state.extras.creatorWallsPage = 0;
+            state.extras.totalNoOfCreatorWalls = 0;
+        },
+        unselectApproval: (state) => {
+            state.extras.selectedApproval = null;
         }
     },
     extraReducers: (builder) => {
@@ -226,7 +299,7 @@ export const dashboardSlice = createSlice({
                 state.description = userData.description ? userData.description : state.description;
                 state.donationLinks = userData.donationLinks ? userData.donationLinks : state.donationLinks;
                 state.socialMediaLinks = userData.socialMediaLinks ? userData.socialMediaLinks : state.socialMediaLinks;
-                state.categories = categories;
+                state.extras.categories = categories;
                 state.approvalWalls = approvalWalls;
             })
             .addCase(loadLikedWallsAsync.pending, (state) => {
@@ -328,10 +401,43 @@ export const dashboardSlice = createSlice({
                 if (state.selectedWall) {
                     state.selectedWall = action.payload;
                 }
+            })
+            .addCase(getExtrasAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(getExtrasAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(getExtrasAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                const { creators, approvals, invites } = action.payload;
+                state.extras.creators = creators;
+                state.extras.approvals = approvals;
+                state.extras.invites = invites;
+            })
+            .addCase(getCategoryByIdAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(getCategoryByIdAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(getCategoryByIdAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                const { categoryData, count } = action.payload;
+                if (state.extras.selectedCategory === null) {
+                    state.extras.selectedCategory = categoryData;
+                    state.extras.totalNoOfCategoryWalls = count;
+                } else {
+                    console.log(categoryData);
+                    if (categoryData.walls && categoryData.walls.length > 0) {
+                        state.extras.selectedCategory.walls = [ ...state.extras.selectedCategory.walls, ...categoryData.walls ]
+                    }
+                }
+                state.extras.categoryWallsPage = state.extras.categoryWallsPage + 1;
             });
     }
 });
 
-export const { toggleSidebar, unselectWall } = dashboardSlice.actions;
+export const { toggleSidebar, unselectWall, unselectCreator, unselectApproval, unselectCategory } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer; 
