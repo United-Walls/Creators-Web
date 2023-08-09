@@ -258,6 +258,53 @@ export const dashboardSlice = createSlice({
     name: 'dashboard',
     initialState,
     reducers: {
+        resetDashboard: (state) => {
+            state.username = "";
+            state.description = "";
+            state.avatar_file_url = "";
+            state.walls = [];
+            state.approvalWalls = [];
+            state.likedWalls = [];
+            state.downloadedWalls = [];
+            state.page = 0;
+            state.likedPage = 0;
+            state.downloadedPage = 0;
+            state.totalNumberOfDownloadedWalls = 0;
+            state.totalNumberOfLikedWalls = 0;
+            state.totalNumberOfWalls = 0;
+            state.sidebarOpened = false;
+            state.userId = "";
+            state.selectedWall = null;
+            state.socialMediaLinks = {
+                twitter: "", 
+                instagram: "", 
+                facebook: "", 
+                mastodon: "", 
+                threads: "", 
+                steam: "", 
+                linkedIn: "",
+                link: "",
+                other: [],
+            };
+            state.donationLinks = {
+                paypal: "",
+                patreon: "" ,
+                otherdonations: []
+            };
+            state.extras = {
+                creatorWallsPage: 0,
+                categoryWallsPage: 0,
+                totalNoOfCategoryWalls: 0,
+                totalNoOfCreatorWalls: 0,
+                selectedCreator: null,
+                selectedCategory: null,
+                selectedApproval: null,
+                creators: [],
+                invites: [],
+                approvals: [],
+                categories: [],
+            }
+        },
         toggleSidebar: (state) => {
             state.sidebarOpened = !state.sidebarOpened;
         },
@@ -438,6 +485,6 @@ export const dashboardSlice = createSlice({
     }
 });
 
-export const { toggleSidebar, unselectWall, unselectCreator, unselectApproval, unselectCategory } = dashboardSlice.actions;
+export const { toggleSidebar, unselectWall, unselectCreator, unselectApproval, unselectCategory, resetDashboard } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer; 

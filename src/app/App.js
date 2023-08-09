@@ -13,7 +13,7 @@ import { faChevronCircleLeft, faChevronCircleRight, faDownload, faHammer, faHear
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import Toast from '../components/Toast/Toast';
 import { addPage } from '../features/page/pageSlice';
-import { getExtrasAsync } from '../features/dashboard/dashboardSlice';
+import { getExtrasAsync, resetDashboard } from '../features/dashboard/dashboardSlice';
 
 library.add(
   faHome, faList, faUpload, faUser, fab, faLink, faQuoteLeft, faImage, faDownload, faHeart, faXmark, faHammer, faChevronCircleRight, faRightFromBracket, faChevronCircleLeft
@@ -30,6 +30,7 @@ const App = () => {
       dispatch(loadUserAsync());
     } else {
       dispatch(logout());
+      dispatch(resetDashboard());
     }
   }, [userToken, dispatch]);
 

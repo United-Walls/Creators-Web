@@ -3,7 +3,7 @@ import './SidebarItem.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleSidebar } from '../../features/dashboard/dashboardSlice';
+import { resetDashboard, toggleSidebar } from '../../features/dashboard/dashboardSlice';
 import { logout } from '../../features/auth/authSlice';
 
 const SidebarItem = ({ name, icon, active, special }) => {
@@ -16,6 +16,7 @@ const SidebarItem = ({ name, icon, active, special }) => {
       onClick={() => {
         if (special) {
           dispatch(logout());
+          dispatch(resetDashboard());
         } else {
           if(name === "Home") {
             navigate(`/dashboard/`)
