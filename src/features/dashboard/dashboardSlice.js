@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchUserData, fetchUserDownloadedWallsCount, fetchUserDownloadedWallsData, fetchUserLikedWallsCount, fetchUserLikedWallsData, fetchUserWallCount } from "../user/userApi";
 import { updateProfile, updateProfilePic } from "../profile/profileAPI";
 import { hideToast, showToast } from "../toast/toastSlice";
-import { deleteWallById, fetchWallByID, getApprovalWalls, updateWallById, uploadWall } from "../wall/wallAPI";
+import { deleteWallAdminById, deleteWallById, fetchWallByID, getApprovalWalls, updateWallAdminById, updateWallById, uploadWall } from "../wall/wallAPI";
 import { fetchCategories, fetchCategoryById, fetchCategoryWallCount } from "../categories/categoriesAPI";
 import { fetchCreators } from "../creators/creatorsAPI";
 import { fetchApprovals } from "../approvals/approvalsAPI";
@@ -254,6 +254,36 @@ export const uploadWallpaperAsync = createAsyncThunk(
     }
 )
 
+export const adminWallDeleteAsync = createAsyncThunk(
+    'dashboard/deleteWallAdmin',
+    async ({ wallId }, { dispatch, rejectWithValue }) => {
+        const wall = await deleteWallAdminById({ wallId });
+        if (wall && wall.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong! Could not delete!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        dispatch(showToast({ status: "success", message: wall.file_name + " Deleted Successfully" }));
+        setTimeout(() => dispatch(hideToast()), 3000);
+        return wall;
+    }
+)
+
+export const adminWallUpdateAsync = createAsyncThunk(
+    'dashboard/updateWallAdmin',
+    async ({ wallId, file_name, category }, { dispatch, rejectWithValue }) => {
+        const wall = await updateWallAdminById({ wallId, file_name, category });
+        if (wall && wall.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong! Could not delete!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            rejectWithValue("rejected");
+        }
+        dispatch(showToast({ status: "success", message: wall.file_name + " Updated Successfully" }));
+        setTimeout(() => dispatch(hideToast()), 3000);
+        return wall;
+    }
+)
+
 export const dashboardSlice = createSlice({
     name: 'dashboard',
     initialState,
@@ -430,6 +460,22 @@ export const dashboardSlice = createSlice({
                 state.status = 'idle';
                 state.walls = state.walls.filter(wall => wall._id !== action.payload._id);
             })
+            .addCase(adminWallDeleteAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(adminWallDeleteAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(adminWallDeleteAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.walls = state.walls.filter(wall => wall._id !== action.payload._id);
+                if (state.extras.selectedCategory && state.extras.selectedCategory.walls && state.extras.selectedCategory.walls.length > 0) {
+                    state.extras.selectedCategory.walls = state.extras.selectedCategory.walls.filter(wall => wall._id !== action.payload._id);
+                }
+                if (state.extras.selectedCreator && state.extras.selectedCreator.walls && state.extras.selectedCreator.walls.length > 0) {
+                    state.extras.selectedCreator.walls = state.extras.selectedCreator.walls.filter(wall => wall._id !== action.payload._id);
+                }
+            })
             .addCase(updateWallByIdAsync.pending, (state) => {
                 state.status = 'loading';
             })
@@ -437,6 +483,43 @@ export const dashboardSlice = createSlice({
                 state.status = 'idle';
             })
             .addCase(updateWallByIdAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                state.walls = state.walls.map(wall => {
+                    if(wall._id === action.payload._id) {
+                        return action.payload
+                    } else {
+                        return wall
+                    }
+                });
+                if (state.extras.selectedCategory && state.extras.selectedCategory.walls && state.extras.selectedCategory.walls.length > 0) {
+                    state.extras.selectedCategory.walls = state.extras.selectedCategory.walls.map(wall => {
+                        if(wall._id === action.payload._id) {
+                            return action.payload
+                        } else {
+                            return wall
+                        }
+                    });
+                }
+                if (state.extras.selectedCreator && state.extras.selectedCreator.walls && state.extras.selectedCreator.walls.length > 0) {
+                    state.extras.selectedCreator.walls = state.extras.selectedCreator.walls.map(wall => {
+                        if(wall._id === action.payload._id) {
+                            return action.payload
+                        } else {
+                            return wall
+                        }
+                    });
+                }
+                if (state.selectedWall) {
+                    state.selectedWall = action.payload;
+                }
+            })
+            .addCase(adminWallUpdateAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(adminWallUpdateAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(adminWallUpdateAsync.fulfilled, (state, action) => {
                 state.status = 'idle';
                 state.walls = state.walls.map(wall => {
                     if(wall._id === action.payload._id) {

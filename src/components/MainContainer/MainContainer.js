@@ -5,8 +5,9 @@ import Loading from '../Loading/Loading';
 import Home from '../../screens/Home/Home';
 import SidebarItem from '../SidebarItem/SidebarItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { deleteWallByIdAsync, unselectWall, updateWallByIdAsync } from '../../features/dashboard/dashboardSlice';
+import { adminWallDeleteAsync, adminWallUpdateAsync, deleteWallByIdAsync, unselectWall, updateWallByIdAsync } from '../../features/dashboard/dashboardSlice';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ username, userPfp, userId }) => {
   const sidebarOpened = useSelector((state => state.dashboard.sidebarOpened));
@@ -87,6 +88,8 @@ const Content = () => {
 }
 
 const WallModal = () => {
+  const userID = useSelector(state => state.auth.user.userID);
+
   const selectedWall = useSelector(state => state.dashboard.selectedWall);
   const categories = useSelector(state => state.dashboard.extras.categories);
   const dispatch = useDispatch();
@@ -95,6 +98,9 @@ const WallModal = () => {
   const [textInputs, setTextInputs] = useState({ file_name: selectedWall.file_name ?? "", category: selectedWall.category })
 
   const [errors, setErrors] = useState([]);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log(textInputs)
@@ -147,7 +153,21 @@ const WallModal = () => {
 
     setTimeout(() => {
       if (!errors || errors.length <= 0) {
-        dispatch(updateWallByIdAsync({ wallId: selectedWall._id, ...textInputs }));
+        if(location.pathname === '/dashboard/admin/categories' && location.search !== '') {
+          if (
+            userID === 975024565
+            || userID === 934949695
+            || userID === 1889905927 
+            || userID === 127070302
+          ) {
+            dispatch(adminWallUpdateAsync({ wallId: selectedWall._id, ...textInputs }));
+          } else {
+            dispatch(unselectWall());
+            navigate("/dashboard");
+          }
+        } else {
+          dispatch(updateWallByIdAsync({ wallId: selectedWall._id, ...textInputs }));
+        }
       } else {
         dispatch(showToast({ status: "error", message: "Well, I think you got some errors to deal with first, scroll up!" }));
         setTimeout(() => dispatch(hideToast()), 5000);
@@ -218,8 +238,23 @@ const WallModal = () => {
                 <div className="inputContainer">
                   <button onClick={handleSubmit} className='settingButton success'>Save changes</button>
                   <button className="settingButton danger" onClick={() => { 
-                    dispatch(deleteWallByIdAsync({ wallId: selectedWall._id } ));
-                    dispatch(unselectWall());
+                    if(location.pathname === '/dashboard/admin/categories' && location.search !== '') {
+                      if (
+                        userID === 975024565
+                        || userID === 934949695
+                        || userID === 1889905927 
+                        || userID === 127070302
+                      ) {
+                        dispatch(adminWallDeleteAsync({ wallId: selectedWall._id }));
+                        dispatch(unselectWall());
+                      } else {
+                        dispatch(unselectWall());
+                        navigate("/dashboard");
+                      }
+                    } else {
+                      dispatch(deleteWallByIdAsync({ wallId: selectedWall._id } ));
+                      dispatch(unselectWall());
+                    }
                   }}>Delete Wall</button>
                 </div>
             </div>

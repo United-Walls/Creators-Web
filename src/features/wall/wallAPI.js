@@ -10,6 +10,26 @@ export const fetchWallByID = async ({ wallId }) => {
     }
 }
 
+export const deleteWallAdminById = async ({ wallId }) => {
+    try {
+        const response = await api.delete(`creators/wallpapers/admin?wallId=${wallId}`);
+        return response.data;
+    } catch(err) {
+        console.error('DEBUG - ', err);
+        return { error: true, msg: err.response.data };
+    }
+}
+
+export const updateWallAdminById = async ({ wallId, file_name, category }) => {
+    try {
+        const response = await api.post(`creators/wallpapers/admin?wallId=${wallId}`, { file_name, category });
+        return response.data;
+    } catch(err) {
+        console.error('DEBUG - ', err);
+        return { error: true, msg: err.response.data };
+    }
+}
+
 export const deleteWallById = async ({ wallId }) => {
     try {
         const response = await api.delete(`creators/wallpapers?wallId=${wallId}`);
