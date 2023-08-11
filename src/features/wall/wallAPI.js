@@ -10,6 +10,16 @@ export const fetchWallByID = async ({ wallId }) => {
     }
 }
 
+export const fixWallAdminById = async ({ wallId }) => {
+    try {
+        const response = await api.get(`creators/wallpapers/admin?wallId=${wallId}`);
+        return response.data;
+    } catch(err) {
+        console.error('DEBUG - ', err);
+        return { error: true, msg: err.response.data, code: err.response.status };
+    }
+}
+
 export const deleteWallAdminById = async ({ wallId }) => {
     try {
         const response = await api.delete(`creators/wallpapers/admin?wallId=${wallId}`);

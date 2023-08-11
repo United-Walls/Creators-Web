@@ -132,6 +132,7 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
         navigate("/dashboard");
       }
     }
+    // eslint-disable-next-line
   }, [location])
 
   useEffect(() => {
@@ -1284,9 +1285,26 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
                       }, 250)
                     }}>
                       <FontAwesomeIcon icon="circle-chevron-left" />
-                      <span>{extras.selectedCategory.name}</span>
+                      <span>{extras.selectedCategory.name} ({extras.totalNoOfCategoryWalls})</span>
                       <span style={{width: "16px"}}></span>
                     </div>
+                    <button 
+                        disabled={error}
+                        className="settingButton success" 
+                        onClick={async (e) => {
+                          e.preventDefault();
+                        }}
+                        style={{ marginTop: "1rem" }}
+                      >Edit Category
+                    </button>
+                    <button 
+                        disabled={error}
+                        className="settingButton danger" 
+                        onClick={async (e) => {
+                          e.preventDefault();
+                        }}
+                      >Delete Category
+                    </button>
                     <div className="wallpapers">
                       <div className="wallpaperGrid">
                       {

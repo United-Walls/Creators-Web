@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchUserData, fetchUserDownloadedWallsCount, fetchUserDownloadedWallsData, fetchUserLikedWallsCount, fetchUserLikedWallsData, fetchUserWallCount } from "../user/userApi";
 import { updateProfile, updateProfilePic } from "../profile/profileAPI";
 import { hideToast, showToast } from "../toast/toastSlice";
-import { deleteWallAdminById, deleteWallById, fetchWallByID, getApprovalWalls, updateWallAdminById, updateWallById, uploadWall } from "../wall/wallAPI";
+import { deleteWallAdminById, deleteWallById, fetchWallByID, fixWallAdminById, getApprovalWalls, updateWallAdminById, updateWallById, uploadWall } from "../wall/wallAPI";
 import { fetchCategories, fetchCategoryById, fetchCategoryWallCount } from "../categories/categoriesAPI";
 import { fetchCreators } from "../creators/creatorsAPI";
 import { fetchApprovals } from "../approvals/approvalsAPI";
@@ -57,6 +57,28 @@ const initialState = {
     }
 };
 
+export const fixWallAdminByIdAsync = createAsyncThunk(
+    'dashboard/fixWall',
+    async ({ wallId }, { dispatch, rejectWithValue }) => {
+        const response = await fixWallAdminById({ wallId });
+        if (response.error && response.code === 404) {
+            dispatch(showToast({ status: "error", message: response.msg}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            return rejectWithValue({ wallId });
+        } else {
+            if (response.error) {
+                dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+                setTimeout(() => dispatch(hideToast()), 3000);
+                return rejectWithValue("rejected");
+            }
+
+            dispatch(showToast({ status: "success", message: "Fixed successfully"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            return;
+        }
+    }
+)
+
 export const getCategoryByIdAsync = createAsyncThunk(
     'dashboard/getCategoryById',
     async ({ categoryId, page }, { dispatch, rejectWithValue }) => {
@@ -75,17 +97,17 @@ export const getExtrasAsync = createAsyncThunk(
         if (creators && creators.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         if (approvals && approvals.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         if (invites && invites.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         return { creators, approvals, invites }
     }
@@ -98,7 +120,7 @@ export const deleteWallByIdAsync = createAsyncThunk(
         if (wall && wall.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong! Could not delete!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         dispatch(showToast({ status: "success", message: wall.file_name + " Deleted Successfully" }));
         setTimeout(() => dispatch(hideToast()), 3000);
@@ -113,7 +135,7 @@ export const updateWallByIdAsync = createAsyncThunk(
         if (wall && wall.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong! Could not delete!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         dispatch(showToast({ status: "success", message: wall.file_name + " Updated Successfully" }));
         setTimeout(() => dispatch(hideToast()), 3000);
@@ -128,7 +150,7 @@ export const loadSelectedWallAsync = createAsyncThunk(
         if (wall && wall.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         return wall;
     }
@@ -145,17 +167,17 @@ export const loadWallsAndUserAsync = createAsyncThunk(
         if (userData && userData.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         if (categories && categories.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         if (approvalWalls && approvalWalls.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue("rejected");
         }
         return { userData, categories, count, approvalWalls };
     }
@@ -163,12 +185,13 @@ export const loadWallsAndUserAsync = createAsyncThunk(
 
 export const loadLikedWallsAsync = createAsyncThunk(
     'dashboard/loadLikedWalls',
-    async ({userId, page}, { dispatch }) => {
+    async ({userId, page}, { dispatch, rejectWithValue }) => {
         const likedWalls = await fetchUserLikedWallsData({ userId, page });
         const likedWallsCount = await fetchUserLikedWallsCount({ userId });
         if (likedWalls && likedWalls.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
+            return rejectWithValue('rejected');
         }
         return { likedWalls, likedWallsCount };
     }
@@ -176,12 +199,13 @@ export const loadLikedWallsAsync = createAsyncThunk(
 
 export const loadDownloadedWallsAsync = createAsyncThunk(
     'dashboard/loadDownloadedWalls',
-    async ({userId, page}, { dispatch }) => {
+    async ({userId, page}, { dispatch, rejectWithValue }) => {
         const downloadedWalls = await fetchUserDownloadedWallsData({userId, page});
         const downloadedWallsCount = await fetchUserDownloadedWallsCount({userId});
         if (downloadedWalls && downloadedWalls.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
+            return rejectWithValue('rejected');
         }
         return { downloadedWalls, downloadedWallsCount };
     }
@@ -209,7 +233,7 @@ export const updateProfilePicAsync = createAsyncThunk(
         const updatedData = await updateProfilePic(formData);
         if (updatedData && updatedData.error) {
             if (updatedData.code === 413) {
-                dispatch(showToast({ status: "error", message: "Bro, Image size is too big, should be less than 10 MB!"}));
+                dispatch(showToast({ status: "error", message: "Bro, Image size is too big, should be less than 50 MB!"}));
             } else {
                 dispatch(showToast({ status: "error", message: "Oops, could not upload!"}));
             }
@@ -261,7 +285,7 @@ export const adminWallDeleteAsync = createAsyncThunk(
         if (wall && wall.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong! Could not delete!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue('rejected');
         }
         dispatch(showToast({ status: "success", message: wall.file_name + " Deleted Successfully" }));
         setTimeout(() => dispatch(hideToast()), 3000);
@@ -276,7 +300,7 @@ export const adminWallUpdateAsync = createAsyncThunk(
         if (wall && wall.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong! Could not delete!"}));
             setTimeout(() => dispatch(hideToast()), 3000);
-            rejectWithValue("rejected");
+            return rejectWithValue('rejected');
         }
         dispatch(showToast({ status: "success", message: wall.file_name + " Updated Successfully" }));
         setTimeout(() => dispatch(hideToast()), 3000);
@@ -564,7 +588,21 @@ export const dashboardSlice = createSlice({
                     }
                 }
                 state.extras.categoryWallsPage = state.extras.categoryWallsPage + 1;
-            });
+            })
+            .addCase(fixWallAdminByIdAsync.pending, (state) => {
+                state.status = 'idle'
+            })
+            .addCase(fixWallAdminByIdAsync.rejected, (state, action) => {
+                if (action.payload.wallId) {
+                    state.walls = state.walls.filter(wall => wall._id !== action.payload.wallId);
+                    if (state.extras.selectedCategory && state.extras.selectedCategory.walls && state.extras.selectedCategory.walls.length > 0) {
+                        state.extras.selectedCategory.walls = state.extras.selectedCategory.walls.filter(wall => wall._id !== action.payload.wallId);
+                    }
+                    if (state.extras.selectedCreator && state.extras.selectedCreator.walls && state.extras.selectedCreator.walls.length > 0) {
+                        state.extras.selectedCreator.walls = state.extras.selectedCreator.walls.filter(wall => wall._id !== action.payload.wallId);
+                    }
+                }
+            })
     }
 });
 

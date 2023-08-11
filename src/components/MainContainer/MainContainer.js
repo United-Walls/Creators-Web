@@ -5,7 +5,7 @@ import Loading from '../Loading/Loading';
 import Home from '../../screens/Home/Home';
 import SidebarItem from '../SidebarItem/SidebarItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { adminWallDeleteAsync, adminWallUpdateAsync, deleteWallByIdAsync, unselectWall, updateWallByIdAsync } from '../../features/dashboard/dashboardSlice';
+import { adminWallDeleteAsync, adminWallUpdateAsync, deleteWallByIdAsync, fixWallAdminByIdAsync, unselectWall, updateWallByIdAsync } from '../../features/dashboard/dashboardSlice';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -235,6 +235,28 @@ const WallModal = () => {
                     })
                   }
                 </div>
+                {
+                  (
+                    userID === 975024565
+                    || userID === 934949695
+                    || userID === 1889905927 
+                    || userID === 127070302
+                  )
+                  &&
+                  location.pathname === '/dashboard/admin/categories' 
+                  && 
+                  location.search !== ''
+                  ?
+                  <div className="inputContainer">
+                    <button style={{ width: '100%'}} className="settingButton" onClick={(e) => {
+                      e.preventDefault()
+                      dispatch(fixWallAdminByIdAsync({ wallId: selectedWall._id }));
+                      dispatch(unselectWall());
+                    }}>Fix Wall</button>
+                  </div>
+                  :
+                  ""
+                }
                 <div className="inputContainer">
                   <button onClick={handleSubmit} className='settingButton success'>Save changes</button>
                   <button className="settingButton danger" onClick={() => { 
