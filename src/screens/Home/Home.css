@@ -196,6 +196,43 @@
     animation: 500ms ease 0s 1 slideFromTop;
 }
 
+.userGrid {
+    display: grid;
+    padding: 2rem;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: 2rem;
+    align-items: center;
+    transform-origin: top;
+    animation: 500ms ease 0s 1 slideFromTop;
+    margin-left: -2.75rem;
+}
+
+.userGrid .pageButton.user {
+    padding: 2rem;
+    position: relative;
+}
+
+.userGrid .pageButton.user .userData {
+    background-color: var(--bgColorTr);
+    padding: 1rem;
+    border-radius: 2rem;
+}
+
+.userGrid .user .userData {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.userGrid .user .userData img {
+    width: 30px;
+    height: 30px;
+    margin-right: 1rem;
+    border-radius: 10rem;
+}
+
 .wallpapers .wallpaperGrid .wallpaper {
     position: relative;
 }
@@ -291,6 +328,15 @@
         width: 200px;
         height: 100px;
     }
+
+    .userGrid {
+        gap: 0.5rem;
+    }
+
+    .userGrid .pageButton.user {
+        padding: 1rem;
+        margin-left: 1.75rem;
+    }
 }
 
 @media screen and (max-width: 45rem) {
@@ -323,6 +369,15 @@
 @media screen and (max-width: 40rem) {
     .wallpapers .wallpaperGrid {
         grid-template-columns: auto auto;
+    }
+
+    .userGrid {
+        gap: 0.2rem;
+    }
+
+    .userGrid .pageButton.user {
+        padding: 0.5rem;
+        margin-left: 2.25rem;
     }
 }
 

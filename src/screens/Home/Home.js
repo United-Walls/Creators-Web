@@ -1366,6 +1366,33 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
                 <span>Edit Creators</span>
                 <span style={{width: "16px"}}></span>
               </div>
+              <div className="userGrid">
+              {
+                extras.creators &&
+                extras.creators.length > 0
+                ?
+                extras.creators.map(creator => {
+                  return (
+                  <div className="pageButton user" style={{
+                    backgroundImage: `url("${creator.walls && creator.walls.length > 0 ? creator.walls[0].thumbnail_url : "unset"}`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    textShadow: "0px 5px 10px #000a"
+                    }}>
+                    <span style={{width: "16px"}}></span>
+                    <span className='userData'>
+                      {creator.avatar_file_url && creator.avatar_file_url.length > 0 ? (<img src={creator.avatar_file_url} alt={creator.username} />) : ""}
+                      <span>{creator.username}</span>
+                    </span>
+                    <FontAwesomeIcon icon="circle-chevron-right" />
+                  </div>
+                  )
+                })
+                :
+                ""
+              }
+              </div>
             </div>
             )
             :
