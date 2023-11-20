@@ -13,6 +13,7 @@
     box-shadow: inset -15px 0px 20px -8px var(--bgColorTr);
     height: 100vh;
     z-index: 99;
+    background-color: var(--bgTertiaryColor);
 }
 
 .sidebar .userContainer {
@@ -66,7 +67,6 @@
     max-width: 100%;
     overflow-x: hidden;
     position: relative;
-    overflow-y: scroll;
     display: flex;
     flex-grow: 1;
     flex-shrink: 0;
@@ -75,7 +75,7 @@
 
 .content .placeholderContent {
     width: 26%;
-    padding-left: 1rem;
+    padding-left: 0.5rem;
 }
 
 .content .wrapper {

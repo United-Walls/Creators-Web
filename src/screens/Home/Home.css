@@ -201,7 +201,7 @@
     padding: 2rem;
     grid-template-columns: auto auto;
     justify-content: center;
-    gap: 2rem;
+    gap: 1rem;
     align-items: center;
     transform-origin: top;
     animation: 500ms ease 0s 1 slideFromTop;

@@ -4,7 +4,7 @@ import { updateProfile, updateProfilePic } from "../profile/profileAPI";
 import { hideToast, showToast } from "../toast/toastSlice";
 import { deleteWallAdminById, deleteWallById, fetchWallByID, fixWallAdminById, getApprovalWalls, updateWallAdminById, updateWallById, uploadWall } from "../wall/wallAPI";
 import { fetchCategories, fetchCategoryById, fetchCategoryWallCount } from "../categories/categoriesAPI";
-import { fetchCreators } from "../creators/creatorsAPI";
+import { fetchCreatorById, fetchCreatorWallCount, fetchCreators } from "../creators/creatorsAPI";
 import { fetchApprovals } from "../approvals/approvalsAPI";
 import { fetchInvites } from "../invites/invitesAPI";
 
@@ -79,11 +79,30 @@ export const fixWallAdminByIdAsync = createAsyncThunk(
     }
 )
 
+export const getCreatorByIdAsync = createAsyncThunk(
+    'dashboard/getCreatorById',
+    async ({ userId, page }, { dispatch, rejectWithValue }) => {
+        const count = await fetchCreatorWallCount({ userId });
+        const creatorData = await fetchCreatorById({ userId, page });
+        if (creatorData && creatorData.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            return rejectWithValue("rejected");
+        }
+        return { creatorData, count };
+    }
+)
+
 export const getCategoryByIdAsync = createAsyncThunk(
     'dashboard/getCategoryById',
     async ({ categoryId, page }, { dispatch, rejectWithValue }) => {
         const count = await fetchCategoryWallCount({ categoryId });
         const categoryData = await fetchCategoryById({ categoryId, page });
+        if (categoryData && categoryData.error) {
+            dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
+            setTimeout(() => dispatch(hideToast()), 3000);
+            return rejectWithValue("rejected");
+        }
         return { categoryData, count };
     }
 )
@@ -588,6 +607,26 @@ export const dashboardSlice = createSlice({
                     }
                 }
                 state.extras.categoryWallsPage = state.extras.categoryWallsPage + 1;
+            })
+            .addCase(getCreatorByIdAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(getCreatorByIdAsync.rejected, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(getCreatorByIdAsync.fulfilled, (state, action) => {
+                state.status = 'idle';
+                const { creatorData, count } = action.payload;
+                if (state.extras.selectedCreator === null) {
+                    state.extras.selectedCreator = creatorData;
+                    state.extras.totalNoOfCreatorWalls = count;
+                } else {
+                    console.log(creatorData);
+                    if (creatorData.walls && creatorData.walls.length > 0) {
+                        state.extras.selectedCreator.walls = [...state.extras.selectedCreator.walls, ...creatorData.walls ];
+                    }
+                }
+                state.extras.creatorWallsPage = state.extras.creatorWallsPage + 1;
             })
             .addCase(fixWallAdminByIdAsync.pending, (state) => {
                 state.status = 'idle'

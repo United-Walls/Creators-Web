@@ -7,7 +7,7 @@
   --boxColor: #89b4fa;
   --successColor: #a6e3a1;
   --dangerColor: #f38ba8;
-  --accentColor: #74c7ec;
+  --accentColor: #ef9f76;
   background-color: var(--bgTertiaryColor);
   color: var(--textColor);
 }
