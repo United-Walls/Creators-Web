@@ -7,7 +7,6 @@ import SidebarItem from '../SidebarItem/SidebarItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { adminWallDeleteAsync, adminWallUpdateAsync, deleteWallByIdAsync, fixWallAdminByIdAsync, unselectWall, updateWallByIdAsync } from '../../features/dashboard/dashboardSlice';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ username, userPfp, userId }) => {
   const sidebarOpened = useSelector((state => state.dashboard.sidebarOpened));
@@ -99,11 +98,7 @@ const WallModal = () => {
 
   const [errors, setErrors] = useState([]);
 
-  const location = useLocation();
-  const navigate = useNavigate();
-
   useEffect(() => {
-    console.log(textInputs)
     if(textInputs.file_name === "") {
       setErrors((state) => {
         let newState = state;
@@ -153,18 +148,13 @@ const WallModal = () => {
 
     setTimeout(() => {
       if (!errors || errors.length <= 0) {
-        if(location.pathname === '/dashboard/admin/categories' && location.search !== '') {
-          if (
-            userID === 975024565
-            || userID === 934949695
-            || userID === 1889905927 
-            || userID === 127070302
-          ) {
-            dispatch(adminWallUpdateAsync({ wallId: selectedWall._id, ...textInputs }));
-          } else {
-            dispatch(unselectWall());
-            navigate("/dashboard");
-          }
+        if (
+          userID === 975024565
+          || userID === 934949695
+          || userID === 1889905927 
+          || userID === 127070302
+        ) {
+          dispatch(adminWallUpdateAsync({ wallId: selectedWall._id, ...textInputs }));
         } else {
           dispatch(updateWallByIdAsync({ wallId: selectedWall._id, ...textInputs }));
         }
@@ -242,10 +232,6 @@ const WallModal = () => {
                     || userID === 1889905927 
                     || userID === 127070302
                   )
-                  &&
-                  location.pathname === '/dashboard/admin/categories' 
-                  && 
-                  location.search !== ''
                   ?
                   <div className="inputContainer">
                     <button style={{ width: '100%'}} className="settingButton" onClick={(e) => {
@@ -260,19 +246,14 @@ const WallModal = () => {
                 <div className="inputContainer">
                   <button onClick={handleSubmit} className='settingButton success'>Save changes</button>
                   <button className="settingButton danger" onClick={() => { 
-                    if(location.pathname === '/dashboard/admin/categories' && location.search !== '') {
-                      if (
-                        userID === 975024565
-                        || userID === 934949695
-                        || userID === 1889905927 
-                        || userID === 127070302
-                      ) {
-                        dispatch(adminWallDeleteAsync({ wallId: selectedWall._id }));
-                        dispatch(unselectWall());
-                      } else {
-                        dispatch(unselectWall());
-                        navigate("/dashboard");
-                      }
+                    if (
+                      userID === 975024565
+                      || userID === 934949695
+                      || userID === 1889905927 
+                      || userID === 127070302
+                    ) {
+                      dispatch(adminWallDeleteAsync({ wallId: selectedWall._id }));
+                      dispatch(unselectWall());
                     } else {
                       dispatch(deleteWallByIdAsync({ wallId: selectedWall._id } ));
                       dispatch(unselectWall());

@@ -3,7 +3,7 @@ import './Home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {ReactComponent as ThreadsIcon} from '../../assets/icons/threads.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCategoryByIdAsync, loadSelectedWallAsync, loadWallsAndUserAsync, toggleSidebar, unselectCategory, updateProfileAsync, updateProfilePicAsync, uploadWallpaperAsync } from '../../features/dashboard/dashboardSlice';
+import { getCategoryByIdAsync, getCreatorByIdAsync, loadSelectedWallAsync, loadWallsAndUserAsync, toggleSidebar, unselectCategory, unselectCreator, updateProfileAsync, updateProfilePicAsync, uploadWallpaperAsync } from '../../features/dashboard/dashboardSlice';
 import { hasWhiteSpace, isValidUrl } from '../..';
 import { hideToast, showToast } from '../../features/toast/toastSlice';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -86,7 +86,6 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
   
   useEffect(() => {
     window.scrollTo(0, 0);
-    console.log(location)
     switch(location.pathname) {
       case "/dashboard/admin/invites":
       case "/dashboard/admin/creators":
@@ -136,8 +135,21 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
   }, [location])
 
   useEffect(() => {
-    console.log(uploadProfilePic);
-  }, [uploadProfilePic]);
+    if (location.pathname === '/dashboard/admin/creators' && location.search !== '') {
+      if (
+        userID === 975024565
+        || userID === 934949695
+        || userID === 1889905927 
+        || userID === 127070302
+      ) {
+        let creatorId = location.search.split('?id=')[1];
+        dispatch(getCreatorByIdAsync({ userId: creatorId, page: extras.creatorWallsPage }));
+      } else {
+        navigate("/dashboard");
+      }
+    }
+    // eslint-disable-next-line
+  }, [location]);
 
   useEffect(() => {
     if(categoryInput.trim().length === 0 || categoryInput === "") {
@@ -569,7 +581,6 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
                       fileRef.current.click();
                     }}
                     onDrop={(e) => {
-                      console.log("File(s) dropped");
                       // Prevent default behavior (Prevent file from being opened)
                       e.preventDefault();
                     
@@ -593,8 +604,6 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
                         });
                       }}}
                       onDragOver={(e) => {
-                        console.log("File(s) in drop zone");
-
                         // Prevent default behavior (Prevent file from being opened)
                         e.preventDefault();
                       }}
@@ -1020,8 +1029,6 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
               }
               <Waypoint scrollableAncestor={window} onEnter={({ previousPosition, currentPosition, event }) => {
                 if (walls.length < userData.totalNoOfWalls) {
-                  console.log(walls.length < userData.totalNoOfWalls, walls.length, userData.totalNoOfWalls);
-                  console.log("Get more walls");
                   dispatch(loadWallsAndUserAsync({ userId: userData.id, page: wallPage }));
                 }
               }} />
@@ -1060,7 +1067,6 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
                 wallRef.current.click();
               }}
               onDrop={(e) => {
-                console.log("File(s) dropped");
                 // Prevent default behavior (Prevent file from being opened)
                 e.preventDefault();
               
@@ -1088,8 +1094,6 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
                   });
                 }}}
                 onDragOver={(e) => {
-                  console.log("File(s) in drop zone");
-
                   // Prevent default behavior (Prevent file from being opened)
                   e.preventDefault();
                 }}
@@ -1159,11 +1163,9 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
                   className="settingButton" 
                   onClick={async (e) => {
                     e.preventDefault();
-                    console.log(categoryInput, wallpaperFiles);
                     const formData = new FormData();
                     formData.append("categoryName", categoryInput.trim())
                     wallpaperFiles.forEach(file => {
-                      console.log(file);
                       formData.append("walls", file);
                     })
                     dispatch(uploadWallpaperAsync(formData));
@@ -1338,8 +1340,6 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
                       }
                       <Waypoint scrollableAncestor={window} onEnter={({ previousPosition, currentPosition, event }) => {
                         if (extras.selectedCategory.walls.length < extras.totalNoOfCategoryWalls) {
-                          console.log(extras.selectedCategory.walls.length < extras.totalNoOfCategoryWalls, extras.selectedCategory.walls.length, extras.totalNoOfCategoryWalls);
-                          console.log("Get more walls");
                           dispatch(getCategoryByIdAsync({ categoryId: extras.selectedCategory._id, page: extras.categoryWallsPage }));
                         }
                       }} />
@@ -1359,42 +1359,121 @@ const Home = ({username, description, donationLinks, socialMediaLinks}) => {
           ?
             location.pathname === "/dashboard/admin/creators"
             ?
-            (
-            <div className="setting">
-              <div className="pageButton" onClick={(e) => navigate('/dashboard/admin')}>
-                <FontAwesomeIcon icon="circle-chevron-left" />
-                <span>Edit Creators</span>
-                <span style={{width: "16px"}}></span>
+              location.search === ''
+              ?
+              (
+              <div className="setting">
+                <div className="pageButton" onClick={(e) => navigate('/dashboard/admin')}>
+                  <FontAwesomeIcon icon="circle-chevron-left" />
+                  <span>Edit Creators</span>
+                  <span style={{width: "16px"}}></span>
+                </div>
+                <div className="userGrid">
+                {
+                  extras.creators &&
+                  extras.creators.length > 0
+                  ?
+                  extras.creators.map(creator => {
+                    return (
+                    <div key={creator._id} id={creator._id} className="pageButton user" style={{
+                      backgroundImage: `url("${creator.walls && creator.walls.length > 0 ? creator.walls[0].thumbnail_url : "unset"}`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      textShadow: "0px 5px 10px #000a"
+                      }} onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/dashboard/admin/creators?id=${creator._id}`);
+                      }}>
+                      <span style={{width: "16px"}}></span>
+                      <span className='userData'>
+                        {creator.avatar_file_url && creator.avatar_file_url.length > 0 ? (<img src={creator.avatar_file_url} alt={creator.username} />) : ""}
+                        <span>{creator.username}</span>
+                      </span>
+                      <FontAwesomeIcon icon="circle-chevron-right" />
+                    </div>
+                    )
+                  })
+                  :
+                  ""
+                }
+                </div>
               </div>
-              <div className="userGrid">
-              {
-                extras.creators &&
-                extras.creators.length > 0
-                ?
-                extras.creators.map(creator => {
-                  return (
-                  <div className="pageButton user" style={{
-                    backgroundImage: `url("${creator.walls && creator.walls.length > 0 ? creator.walls[0].thumbnail_url : "unset"}`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    textShadow: "0px 5px 10px #000a"
+              )
+              :
+              extras && extras.selectedCreator
+              ?
+                (
+                  <div className="setting">
+                    <div className="pageButton" onClick={(e) => {
+                      dispatch(unselectCreator());
+                      setTimeout(() => {
+                        navigate('/dashboard/admin/creators');
+                      }, 250);
                     }}>
-                    <span style={{width: "16px"}}></span>
-                    <span className='userData'>
-                      {creator.avatar_file_url && creator.avatar_file_url.length > 0 ? (<img src={creator.avatar_file_url} alt={creator.username} />) : ""}
-                      <span>{creator.username}</span>
-                    </span>
-                    <FontAwesomeIcon icon="circle-chevron-right" />
+                      <FontAwesomeIcon icon="circle-chevron-left" />
+                      <span>{extras.selectedCreator.username} ({extras.totalNoOfCreatorWalls})</span>
+                      <span style={{width: "16px"}}></span>
+                    </div>
+                    <button 
+                        disabled={error}
+                        className="settingButton success" 
+                        onClick={async (e) => {
+                          e.preventDefault();
+                        }}
+                        style={{ marginTop: "1rem" }}
+                      >Edit Creator
+                    </button>
+                    <button 
+                        disabled={error}
+                        className="settingButton danger" 
+                        onClick={async (e) => {
+                          e.preventDefault();
+                        }}
+                      >Delete Creator
+                    </button>
+                    <div className="wallpapers">
+                      <div className="wallpaperGrid">
+                        {
+                          extras.selectedCreator.walls &&
+                          extras.selectedCreator.walls.length > 0 &&
+                          extras.selectedCreator.walls.map((wall, index) => {
+                            return (
+                              <div key={wall._id} id={wall._id} className={`wallpaper wall-${index + 1}`} onClick={(e) => {
+                                e.preventDefault();
+                                dispatch(loadSelectedWallAsync({wallId: wall._id}));
+                              }}>
+                                <img src={wall.thumbnail_url} alt={wall.file_name} />
+                                <div className="dataInfo">
+                                  <div className="data likes">
+                                    <div className="icon">
+                                      <FontAwesomeIcon icon="heart" />
+                                    </div>
+                                    <div className="info">{ wall.timesFavourite }</div>
+                                  </div>
+                                  <div className="data downloads">
+                                    <div className="icon">
+                                      <FontAwesomeIcon icon='download' />
+                                    </div>
+                                    <div className="info">{ wall.timesDownloaded }</div>
+                                  </div>
+                                </div>
+                                <span>{ wall.file_name }</span>
+                              </div>
+                            )
+                          })
+                        }
+                        <Waypoint scrollableAncestor={window} onEnter={({ previousPosition, currentPosition, event }) => {
+                          if (extras.selectedCreator.walls.length < extras.totalNoOfCreatorWalls) {
+                            dispatch(getCreatorByIdAsync({ userId: extras.selectedCreator._id, page: extras.creatorWallsPage }));
+                          }
+                        }} />
+                      </div>
+                    </div>
                   </div>
-                  )
-                })
-                :
+                )
+              :
                 ""
-              }
-              </div>
-            </div>
-            )
             :
             ""
           :

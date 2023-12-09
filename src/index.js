@@ -27,6 +27,5 @@ export const isValidUrl = (urlString) => {
 }
 
 export const hasWhiteSpace = (s) => {
-  console.log((/\s/).test(s))
   return (/\s/).test(s);
 }

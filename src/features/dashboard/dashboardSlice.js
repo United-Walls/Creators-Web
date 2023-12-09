@@ -181,7 +181,6 @@ export const loadWallsAndUserAsync = createAsyncThunk(
         const userData = await fetchUserData({ userId, page });
         const categories = await fetchCategories();
         const approvalWalls = await getApprovalWalls({ userId });
-        console.log(userData);
         const count = await fetchUserWallCount({ userId });
         if (userData && userData.error) {
             dispatch(showToast({ status: "error", message: "Oops, something went wrong!"}));
@@ -285,7 +284,6 @@ export const uploadWallpaperAsync = createAsyncThunk(
             setTimeout(() => dispatch(hideToast()), 3000);
             for(let i = 0; i < uploadedWall.length; i++) {
                 let wall = uploadedWall[i];
-                console.log(wall);
                 if (wall.wall.hidden === true) {
                     approvalWalls.push(wall);
                 } else {
@@ -385,7 +383,6 @@ export const dashboardSlice = createSlice({
             state.selectedWall = null;
         },
         unselectCategory: (state) => {
-            console.log("unselectCategory")
             state.extras.selectedCategory = null;
             state.extras.categoryWallsPage = 0;
             state.extras.totalNoOfCategoryWalls = 0;
@@ -601,7 +598,9 @@ export const dashboardSlice = createSlice({
                     state.extras.selectedCategory = categoryData;
                     state.extras.totalNoOfCategoryWalls = count;
                 } else {
-                    console.log(categoryData);
+                    if (categoryData.walls.length === 0) {
+                        state.extras.totalNoOfCategoryWalls = state.extras.selectedCategory.walls.length;
+                    }
                     if (categoryData.walls && categoryData.walls.length > 0) {
                         state.extras.selectedCategory.walls = [ ...state.extras.selectedCategory.walls, ...categoryData.walls ]
                     }
@@ -621,7 +620,9 @@ export const dashboardSlice = createSlice({
                     state.extras.selectedCreator = creatorData;
                     state.extras.totalNoOfCreatorWalls = count;
                 } else {
-                    console.log(creatorData);
+                    if (creatorData.walls.length === 0) {
+                        state.extras.totalNoOfCreatorWalls = state.extras.selectedCreator.walls.length;
+                    }
                     if (creatorData.walls && creatorData.walls.length > 0) {
                         state.extras.selectedCreator.walls = [...state.extras.selectedCreator.walls, ...creatorData.walls ];
                     }
